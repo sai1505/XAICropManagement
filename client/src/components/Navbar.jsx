@@ -1,40 +1,76 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 
 const Navbar = () => {
     const navRef = useRef(null);
+    const navigate = useNavigate();
+    const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // --- Replaced GSAP ScrollTrigger with a native React scroll listener ---
     useEffect(() => {
         const handleScroll = () => {
-            // Set state to true if user has scrolled more than 50px
             setIsScrolled(window.scrollY > 50);
         };
 
-        // Add the event listener when the component mounts
         window.addEventListener('scroll', handleScroll);
 
-        // Clean up the event listener when the component unmounts
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []); // Empty array means this effect runs only once (on mount)
+    }, []);
 
-    // --- Replaced GSAP ScrollTo with native scrollIntoView ---
-    const scrollToSection = (sectionId) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-            });
+    // Handle scrolling to section after navigation
+    useEffect(() => {
+        const hash = location.hash;
+        if (hash) {
+            // Small delay to ensure the page has rendered
+            setTimeout(() => {
+                const element = document.querySelector(hash);
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }
+            }, 100);
         }
+    }, [location]);
+
+    const scrollToSection = (sectionId) => {
+        const currentPath = location.pathname;
+        
+        // If we're already on the home page
+        if (currentPath === '/') {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        } else {
+            // Navigate to home page with hash
+            navigate(`/#${sectionId}`);
+        }
+        
         setIsMenuOpen(false);
     };
 
+    const handleNavigation = (item) => {
+        if (item.id) {
+            // It's a section scroll
+            scrollToSection(item.id);
+        } else if (item.href) {
+            // It's a regular link
+            navigate(item.href);
+            setIsMenuOpen(false);
+        }
+    };
+
     const navItems = [
+        { name: 'Home', href: '/' },
         { name: 'Features', id: 'features' },
         { name: 'How It Works', id: 'how' },
         { name: 'Sign Up', href: '/signup' },
@@ -46,9 +82,6 @@ const Navbar = () => {
             ref={navRef}
             className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-[95%] max-w-6xl"
         >
-            {/* This div now uses conditional classes based on the `isScrolled` state.
-              We also add Tailwind's 'transition-all duration-300' to animate the changes.
-            */}
             <div
                 className={`
                     backdrop-blur-md rounded-full px-8 py-4 border-2
@@ -61,7 +94,10 @@ const Navbar = () => {
             >
                 <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <div className="flex items-center gap-2 cursor-pointer">
+                    <div 
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => navigate('/')}
+                    >
                         <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center shadow-md">
                             <Leaf className="w-6 h-6 text-white" />
                         </div>
@@ -75,14 +111,7 @@ const Navbar = () => {
                         {navItems.map((item, index) => (
                             <button
                                 key={index}
-                                onClick={() => {
-                                    if (item.id) {
-                                        scrollToSection(item.id);
-                                    } else if (item.href) {
-                                        window.location.href = item.href;
-                                    }
-                                }}
-                                // --- Removed GSAP hover, using Tailwind's hover:scale-105 ---
+                                onClick={() => handleNavigation(item)}
                                 className={`
                                     px-6 py-2.5 rounded-full font-semibold
                                     transition-all duration-200 ease-out
@@ -90,7 +119,9 @@ const Navbar = () => {
                                     ${item.href
                                         ? item.name === 'Sign Up'
                                             ? 'bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg'
-                                            : 'border-2 border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800'
+                                            : item.name === 'Sign In'
+                                            ? 'border-2 border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800'
+                                            : 'text-green-800 hover:bg-green-100 hover:text-green-900'
                                         : 'text-green-800 hover:bg-green-100 hover:text-green-900'
                                     }
                                 `}
@@ -135,19 +166,16 @@ const Navbar = () => {
                         {navItems.map((item, index) => (
                             <button
                                 key={index}
-                                onClick={() => {
-                                    if (item.id) {
-                                        scrollToSection(item.id);
-                                    } else if (item.href) {
-                                        window.location.href = item.href;
-                                    }
-                                }}
-                                className={`block w-full text-center px-6 py-3 rounded-full mb-2 transition-all font-semibold ${item.href
-                                    ? item.name === 'Sign Up'
-                                        ? 'bg-green-600 text-white hover:bg-green-700 shadow-md'
-                                        : 'border-2 border-green-600 text-green-700 hover:bg-green-50'
-                                    : 'text-green-800 hover:bg-green-100'
-                                    }`}
+                                onClick={() => handleNavigation(item)}
+                                className={`block w-full text-center px-6 py-3 rounded-full mb-2 transition-all font-semibold ${
+                                    item.href
+                                        ? item.name === 'Sign Up'
+                                            ? 'bg-green-600 text-white hover:bg-green-700 shadow-md'
+                                            : item.name === 'Sign In'
+                                            ? 'border-2 border-green-600 text-green-700 hover:bg-green-50'
+                                            : 'text-green-800 hover:bg-green-100'
+                                        : 'text-green-800 hover:bg-green-100'
+                                }`}
                             >
                                 {item.name}
                             </button>

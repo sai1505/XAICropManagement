@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SignUp from './components/Auth/Signup';
+import SignIn from './components/Auth/SignIn';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path='/signup' element={<SignUp />} />
+            <Route path='/signin' element={<SignIn />} />
           </Routes>
         </main>
 

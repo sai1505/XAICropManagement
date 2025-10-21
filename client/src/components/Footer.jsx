@@ -12,7 +12,7 @@ const Footer = () => {
     // so I've removed them for cleanup.
 
     return (
-        <footer className="w-full bg-white/90 backdrop-blur-md shadow-inner border-t-2 border-green-100 rounded-t-2xl mt-20">
+        <footer className="w-full bg-white/90 backdrop-blur-md shadow-inner border-t-2 border-green-100 rounded-t-2xl">
             <div className="bg-white/90 backdrop-blur-md shadow-xl border-green-200 px-8 py-10">
 
                 {/* --- FIX: Replaced Grid with Flexbox --- */}
