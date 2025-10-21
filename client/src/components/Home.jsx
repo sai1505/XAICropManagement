@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Leaf, Brain, Camera, TrendingUp, Shield, Zap } from 'lucide-react';
 import * as THREE from 'three';
-// --- FIX: Import Framer Motion ---
 import { motion, useScroll, useTransform } from 'framer-motion';
-
-// --- FIX: Remove GSAP imports ---
-// gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Home = () => {
     // --- FIX: Removed refs that were only for GSAP selectors ---
@@ -16,12 +13,6 @@ const Home = () => {
     const howItWorksRef = useRef(null);
     const canvasRef = useRef(null);
     const ctaRef = useRef(null);
-    // const plantSvgRef = useRef(null); // No longer needed
-    // const headingRef = useRef(null); // No longer needed
-    // ... etc
-
-    // --- Three.js Scene (No Changes) ---
-    // This code is correct and includes proper cleanup.
     useEffect(() => {
         if (!canvasRef.current) return;
         let animationFrameId;
@@ -185,6 +176,8 @@ const Home = () => {
         },
     ];
 
+    const navigate = useNavigate();
+
     return (
         // --- FIX: Removed containerRef, Framer Motion doesn't need it ---
         <div className="min-h-screen bg-white overflow-x-hidden">
@@ -256,17 +249,28 @@ const Home = () => {
                     <motion.p variants={staggerItem} className="hero-subtitle text-xl text-green-700 mb-12 max-w-3xl mx-auto">
                         Leveraging YOLOv8 and Explainable AI...
                     </motion.p>
+
                     <motion.div variants={staggerItem} className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center">
-                        <button className="bg-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-700 transition transform hover:scale-105">
+                        <button
+                            onClick={() => navigate('/signup')}
+                            className="bg-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-700 transition transform hover:scale-105"
+                        >
                             Try Disease Detection
                         </button>
-                        <button className="border-2 border-green-600 text-green-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-50 transition">
+                        <button
+                            onClick={() => {
+                                const element = document.getElementById('features');
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }}
+                            className="border-2 border-green-600 text-green-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-50 transition"
+                        >
                             Learn More
                         </button>
                     </motion.div>
 
                     {/* Animated Plant SVG */}
-                    {/* --- FIX: Replaced GSAP with simple initial/animate --- */}
                     <motion.div
                         className="mt-20"
                         initial={{ scale: 0, rotation: -180, opacity: 0 }}
