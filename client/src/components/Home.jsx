@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Leaf, Brain, Camera, TrendingUp, Shield, Zap } from 'lucide-react';
-import * as THREE from 'three';
+import * as THREE from 'three'; 
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {

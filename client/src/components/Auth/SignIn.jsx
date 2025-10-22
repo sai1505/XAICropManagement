@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -71,14 +73,51 @@ const SignIn = () => {
                 if (response.ok && data.success) {
                     console.log('Sign in successful:', data.user);
 
-                    // Store user data in localStorage (optional)
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Store user data in sessionStorage
+                    sessionStorage.setItem('userId', data.user.id || data.user._id);
+                    sessionStorage.setItem('userName', data.user.name);
+                    sessionStorage.setItem('userEmail', data.user.email);
+                    sessionStorage.setItem('isAuthenticated', 'true');
 
-                    // Show success message
-                    alert(`Welcome back, ${data.user.name}!`);
+                    // Store token if provided
+                    if (data.token) {
+                        sessionStorage.setItem('authToken', data.token);
+                    }
 
-                    // Redirect to dashboard or home
-                    window.location.href = '/dashboard'; // or wherever you want
+                    // If "Remember Me" is checked, also store in localStorage
+                    if (formData.rememberMe) {
+                        localStorage.setItem('userId', data.user.id || data.user._id);
+                        localStorage.setItem('userName', data.user.name);
+                        localStorage.setItem('userEmail', data.user.email);
+                        localStorage.setItem('rememberMe', 'true');
+                        if (data.token) {
+                            localStorage.setItem('authToken', data.token);
+                        }
+                    }
+
+                    // Show success notification
+                    // Show success notification
+                    const successNotification = document.createElement('div');
+                    successNotification.className = 'fixed top-6 right-6 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3';
+                    successNotification.innerHTML = `
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span class="font-semibold">Welcome back, ${data.user.name}!</span>
+`;
+                    document.body.appendChild(successNotification);
+
+                    // Remove notification after 3 seconds
+                    setTimeout(() => {
+                        successNotification.remove();
+                    }, 5000);
+
+                    // Redirect to dashboard after 1 second
+                    setTimeout(() => {
+                        navigate('/dashboard');
+                    }, 1000);
+
+
                 } else {
                     // Handle error from backend
                     setErrors({
@@ -97,10 +136,14 @@ const SignIn = () => {
         }
     };
 
-
     const handleGoogleSignIn = () => {
         console.log('Google sign-in initiated');
         // Implement Google OAuth logic here
+        // After successful Google sign-in, set session storage similarly:
+        // sessionStorage.setItem('userId', user.id);
+        // sessionStorage.setItem('userName', user.name);
+        // sessionStorage.setItem('userEmail', user.email);
+        // sessionStorage.setItem('isAuthenticated', 'true');
     };
 
     const handleForgotPassword = async (e) => {
@@ -121,6 +164,7 @@ const SignIn = () => {
         }, 1000);
     };
 
+    // Animation variants remain the same
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -228,6 +272,21 @@ const SignIn = () => {
                     transition={{ duration: 0.2 }}
                 >
                     <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Display submit error if exists */}
+                        <AnimatePresence>
+                            {errors.submit && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2"
+                                >
+                                    <AlertCircle className="w-5 h-5" />
+                                    <span className="text-sm font-medium">{errors.submit}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {/* Email Field */}
                         <motion.div variants={itemVariants}>
                             <label className="block text-sm font-semibold text-green-900 mb-2">
@@ -241,8 +300,8 @@ const SignIn = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-4 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.email
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="john@example.com"
                                     whileFocus={{ scale: 1.02 }}
@@ -276,8 +335,8 @@ const SignIn = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-12 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.password
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="••••••••"
                                     whileFocus={{ scale: 1.02 }}
@@ -353,8 +412,8 @@ const SignIn = () => {
                             type="submit"
                             disabled={isSubmitting}
                             className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all duration-200 ${isSubmitting
-                                    ? 'bg-green-400 cursor-not-allowed'
-                                    : 'bg-green-600 hover:bg-green-700 hover:shadow-xl'
+                                ? 'bg-green-400 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700 hover:shadow-xl'
                                 }`}
                             whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                             whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
@@ -425,7 +484,7 @@ const SignIn = () => {
                 </motion.p>
             </motion.div>
 
-            {/* Forgot Password Modal */}
+            {/* Forgot Password Modal - remains the same */}
             <AnimatePresence>
                 {showForgotPassword && (
                     <>
