@@ -96,7 +96,6 @@ const SignIn = () => {
                     }
 
                     // Show success notification
-                    // Show success notification
                     const successNotification = document.createElement('div');
                     successNotification.className = 'fixed top-6 right-6 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3';
                     successNotification.innerHTML = `

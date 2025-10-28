@@ -15,6 +15,7 @@ const SignUp = () => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
+    const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
     // Password strength calculator
     const calculatePasswordStrength = (password) => {
@@ -89,10 +90,14 @@ const SignUp = () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    console.log('User registered:', data.user);
-                    // Show success message or redirect
-                    alert('Registration successful!');
-                    window.location.href = '/signin';
+                    // Show success notification
+                    setShowSuccessNotification(true);
+
+                    // Hide notification and redirect after delay
+                    setTimeout(() => {
+                        setShowSuccessNotification(false);
+                        window.location.href = '/signin';
+                    }, 3500);
                 } else {
                     // Handle validation errors from backend
                     const backendErrors = {};
@@ -109,7 +114,6 @@ const SignUp = () => {
             }
         }
     };
-
 
     const handleGoogleSignIn = () => {
         console.log('Google sign-in initiated');
@@ -236,8 +240,8 @@ const SignUp = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-4 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.name
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="John Doe"
                                     whileFocus={{ scale: 1.02 }}
@@ -273,8 +277,8 @@ const SignUp = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-4 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.email
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="john@example.com"
                                     whileFocus={{ scale: 1.02 }}
@@ -310,8 +314,8 @@ const SignUp = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-12 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.password
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="••••••••"
                                     whileFocus={{ scale: 1.02 }}
@@ -374,8 +378,8 @@ const SignUp = () => {
                                     value={formData.confirmPass}
                                     onChange={handleChange}
                                     className={`w-full pl-12 pr-12 py-3.5 rounded-xl border-2 transition-all duration-200 focus:outline-none ${errors.confirmPass
-                                            ? 'border-red-400 focus:border-red-500 bg-red-50'
-                                            : 'border-green-200 focus:border-green-500 bg-white'
+                                        ? 'border-red-400 focus:border-red-500 bg-red-50'
+                                        : 'border-green-200 focus:border-green-500 bg-white'
                                         }`}
                                     placeholder="••••••••"
                                     whileFocus={{ scale: 1.02 }}
@@ -410,8 +414,8 @@ const SignUp = () => {
                             type="submit"
                             disabled={isSubmitting}
                             className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all duration-200 ${isSubmitting
-                                    ? 'bg-green-400 cursor-not-allowed'
-                                    : 'bg-green-600 hover:bg-green-700 hover:shadow-xl'
+                                ? 'bg-green-400 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700 hover:shadow-xl'
                                 }`}
                             whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                             whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
@@ -469,18 +473,35 @@ const SignUp = () => {
                         </a>
                     </motion.p>
                 </motion.div>
-
-                {/* Terms */}
-                <motion.p
-                    className="text-center mt-6 text-sm text-green-600"
-                    variants={itemVariants}
-                >
-                    By signing up, you agree to our{' '}
-                    <a href="#" className="underline hover:text-green-800 transition-colors">Terms of Service</a>
-                    {' '}and{' '}
-                    <a href="#" className="underline hover:text-green-800 transition-colors">Privacy Policy</a>
-                </motion.p>
             </motion.div>
+
+            {/* Success Notification */}
+            <AnimatePresence>
+                {showSuccessNotification && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed top-6 right-6 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3"
+                    >
+                        <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        <span className="font-semibold">Registration Successfull!</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

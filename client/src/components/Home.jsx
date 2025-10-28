@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Leaf, Brain, Camera, TrendingUp, Shield, Zap } from 'lucide-react';
-import * as THREE from 'three'; 
+import * as THREE from 'three';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {
@@ -565,6 +565,7 @@ const Home = () => {
                         Join thousands of farmers using AI...
                     </motion.p>
                     <motion.button
+                        onClick={() => navigate('/signup')}
                         variants={staggerItem}
                         whileHover={{ scale: 1.05 }}
                         className="bg-white text-green-600 px-10 py-4 rounded-full text-lg font-semibold hover:bg-green-50 transition shadow-2xl"
