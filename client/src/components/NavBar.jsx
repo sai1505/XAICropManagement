@@ -1,5 +1,5 @@
 import React from "react";
-import {Asterisk} from 'lucide-react';
+import { Asterisk } from 'lucide-react';
 import Lottie from "lottie-react";
 import leafAnim from "../assets/LeafAnim.json";
 
@@ -15,10 +15,10 @@ export default function NavBar() {
 
                 {/* Center Links */}
                 <div className="hidden md:flex items-center px-49 gap-8 text-gray-800 -mt-1">
-                    <a href="#" className="font-poppins hover:text-black hover:bg-gray-300 px-3 py-1.5 rounded-full transition-colors">Product</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-gray-300 px-3 py-1.5 rounded-full transition-colors">Customers</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-gray-300 px-3 py-1.5 rounded-full transition-colors">Company</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-gray-300 px-3 py-1.5 rounded-full transition-colors">Resources</a>
+                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Product</a>
+                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Customers</a>
+                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Company</a>
+                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Resources</a>
                 </div>
 
                 {/*Right Side*/}
