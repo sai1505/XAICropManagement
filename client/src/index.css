@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+@font-face {
+    font-family: poiretone;
+    src: url(../src/assets/fonts/PoiretOne-Regular.ttf);
+}
+
+@font-face {
+    font-family: poppins;
+    src: url(../src/assets/fonts/Poppins-Regular.ttf);
+}
+
+@font-face {
+    font-family: poppins-medium;
+    src: url(../src/assets/fonts/Poppins-Medium.ttf);
+}
+
+@font-face {
+    font-family: poppins-bold;
+    src: url(../src/assets/fonts/Poppins-Bold.ttf);
+}
+
+.font-poiretone {
+    font-family: poiretone;
+}
+
+.font-poppins {
+    font-family: poppins;
+}
+
+.font-poppins-medium {
+    font-family: poppins-medium;
+}
+
+.font-poppins-bold {
+    font-family: poppins-bold;
+}
