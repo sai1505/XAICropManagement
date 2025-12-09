@@ -1,16 +1,36 @@
 import React from "react";
 import { Asterisk } from 'lucide-react';
 import Lottie from "lottie-react";
+import { useState, useEffect } from "react";
 import leafAnim from "../assets/LeafAnim.json";
 
 export default function NavBar() {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handscroll = () => {
+            if (window.scrollY > 420) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+
+        window.addEventListener("scroll", handscroll);
+        return () => window.removeEventListener("scroll", handscroll);
+    }, []);
+
     return (
-        <nav className="group absolute top-0 w-full z-20 bg-transparent px-8" >
+        <nav
+            className={`group fixed top-0 w-full h-22 z-10 px-8 transition-colors -mt-3
+        ${scrolled ? "bg-gray-100/40 backdrop-blur-sm shadow-xs" : "bg-transparent"}
+    `}
+        >
             <div className="relative w-full flex items-center justify-between px-6 py-4" >
                 {/* Logo Section */}
                 <div className="flex items-center gap-3 text-xl font-bold tracking-normal cursor-pointer text-lime-700 " >
                     <Lottie animationData={leafAnim} className="w-18 h-18" />
-                    <span className="text-xl font-poiretone tracking-[0.25rem]">XCROPAI</span>
+                    <span className="text-xl font-poiretone text-black tracking-[0.25rem]">XCROPAI</span>
                 </div>
 
                 {/* Center Links */}
@@ -26,6 +46,6 @@ export default function NavBar() {
                     Sign up / Sign in
                 </button>
             </div>
-        </nav>
+        </nav >
     );
 }
