@@ -4,12 +4,30 @@ import Lottie from "lottie-react";
 import { useEffect, useState } from "react";
 import leafAnim from "../assets/LeafAnim.json";
 
+const navLinks = [
+    { name: "Home", target: "home" },
+    { name: "Stats", target: "stats" },
+    { name: "Problems", target: "problems" },
+    { name: "Solution", target: "solution" },
+    { name: "Key Features", target: "keyFeatures" },
+];
+
+const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    window.scrollTo({
+        top: el.offsetTop - 80, // offset for the fixed navbar
+        behavior: "smooth",
+    });
+};
+
 export default function NavBar() {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 300) setScrolled(true);
+            if (window.scrollY > 10) setScrolled(true);
             else setScrolled(false);
         };
 
@@ -33,11 +51,17 @@ export default function NavBar() {
 
                 {/* Center Links */}
                 <div className="hidden md:flex items-center px-49 gap-8 text-gray-800 -mt-1">
-                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Product</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Customers</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Company</a>
-                    <a href="#" className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors">Resources</a>
+                    {navLinks.map((link) => (
+                        <button
+                            key={link.target}
+                            onClick={() => scrollToSection(link.target)}
+                            className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors"
+                        >
+                            {link.name}
+                        </button>
+                    ))}
                 </div>
+
 
                 {/*Right Side*/}
                 <button className="font-poppins text-sm tracking-normal bg-lime-200 px-4 py-2.5 rounded-full hover:bg-lime-400 transition-colors" >

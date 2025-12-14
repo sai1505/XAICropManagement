@@ -159,7 +159,7 @@ export default function HomePage() {
         setActive(active === id ? null : id);
     }
     return (
-        <section className="relative w-full flex flex-col items-center">
+        <section id="home" className="relative w-full flex flex-col items-center">
 
             {/* Background Image */}
             <div className="w-full h-[84vh] relative">
@@ -192,7 +192,7 @@ export default function HomePage() {
             <div className="w-320 h-0.5 bg-gray-200 mt-40"></div>
 
             {/* Stats */}
-            <section className="w-full bg-white py-20">
+            <section id="stats" className="w-full bg-white py-20">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
 
                     {stats.map((stat) => (
@@ -224,7 +224,7 @@ export default function HomePage() {
             <div className="w-320 h-0.5 bg-gray-200"></div>
 
             {/* Problems Section */}
-            <section className="w-full bg-white py-20">
+            <section id="problems" className="w-full bg-white py-20">
                 <div className="max-w-7xl mx-auto px-6">
                     {/* Title */}
                     <h2 className="text-3xl md:text-4xl font-poppins-medium text-gray-900">
@@ -294,7 +294,7 @@ export default function HomePage() {
             <div className="w-320 h-0.5 bg-gray-200"></div>
 
             {/* Our Solution */}
-            <section className="w-full py-24 bg-white">
+            <section id="solution" className="w-full py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12">
 
                     {/* LEFT SIDE — Dynamic Card */}
@@ -365,8 +365,9 @@ export default function HomePage() {
             </section>
 
             {/* Horizontal Divider */}
-            <div className="w-320 h-0.5 bg-gray-200"></div>
+            <div id="keyFeatures" className="w-320 h-0.5 bg-gray-200"></div>
 
+            {/*  Key Features */}
             <section className="w-full py-20 bg-white">
                 <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="mb-10">
