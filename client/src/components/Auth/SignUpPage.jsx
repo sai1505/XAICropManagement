@@ -43,8 +43,8 @@ export default function SignUpPage() {
                 emailRedirectTo: "http://localhost:5173/signin",
                 data: {
                     display_name: displayName,
-                }
-            }
+                },
+            },
         });
 
         if (error) {
@@ -52,8 +52,16 @@ export default function SignUpPage() {
             return;
         }
 
+        // USER ALREADY EXISTS
+        if (data?.user && data.user.identities?.length === 0) {
+            toast.error("This email is already registered. Please sign in.");
+            return;
+        }
+
+        // ✅ NEW USER
         toast.success("Check your email for verification");
-    }
+    };
+
 
     return (
         <div className="min-h-screen flex">
@@ -130,7 +138,7 @@ export default function SignUpPage() {
 
                     <p className="text-sm font-poppins text-center mt-6">
                         Already have an account ? {" "}
-                        <span className="text-amber-950 cursor-pointer" onClick={() => navigate('/signin')}>Sign in</span>
+                        <span className="text-amber-950 cursor-pointer hover:underline" onClick={() => navigate('/signin')}>Sign in</span>
                     </p>
                 </div>
             </div>

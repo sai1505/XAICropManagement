@@ -46,7 +46,7 @@ export default function SignInPage() {
 
                     <p className="text-sm font-poppins text-center mt-6">
                         Don’t have an account?{" "}
-                        <span className="text-amber-950 cursor-pointer" onClick={() => navigate('/signup')}>
+                        <span className="text-amber-950 cursor-pointer hover:underline" onClick={() => navigate('/signup')}>
                             Sign up
                         </span>
                     </p>

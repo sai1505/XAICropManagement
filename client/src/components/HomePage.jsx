@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { FiZap, FiImage, FiBarChart, FiTarget, FiTrendingUp, FiWifiOff, FiGrid } from "react-icons/fi";
 
 function AnimatedNumber({ from = 0, to, duration = 2500, format }) {
@@ -150,6 +151,7 @@ const features = [
 export default function HomePage() {
     const [active, setActive] = useState(1);
     const [cards, setCards] = useState(null);
+    const navigate = useNavigate();
 
     const toggle = (id) => {
         setCards(cards === id ? null : id); // click again to close
@@ -182,7 +184,8 @@ export default function HomePage() {
                         Real-time disease identification, actionable insights, and scientific recommendations — helping farmers and enterprises prevent crop loss, stabilize supply chains, and ensure food security.
                     </p>
 
-                    <button className="mt-6 font-poppins bg-lime-200 text-black px-6 py-3 rounded-full text-lg hover:bg-lime-400 transition-colors">
+                    <button className="mt-6 font-poppins bg-lime-200 text-black px-6 py-3 rounded-full text-lg hover:bg-lime-400 transition-colors"
+                        onClick={() => navigate('/signup')}>
                         Get started
                     </button>
                 </div>
@@ -428,7 +431,8 @@ export default function HomePage() {
 
                     {/* Buttons */}
                     <div className="mt-10 flex justify-center gap-4">
-                        <button className="px-8 py-3 rounded-full bg-lime-200 text-black text-md font-poppins-medium hover:bg-lime-400 transition-all duration-300">
+                        <button className="px-8 py-3 rounded-full bg-lime-200 text-black text-md font-poppins-medium hover:bg-lime-400 transition-all duration-300"
+                            onClick={() => navigate('/signup')}>
                             Try XCropAI
                         </button>
                     </div>
