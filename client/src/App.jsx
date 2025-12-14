@@ -4,6 +4,8 @@ import Footer from "./components/Footer";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUpPage from "./components/Auth/SignUpPage";
 import SignInPage from "./components/Auth/SignInPage";
+import UserDashboard from "./components/User/UserDashboard";
+import ProtectedRoutes from "./components/Routes/ProtectedRoutes";
 
 export default function App() {
   return (
@@ -14,10 +16,19 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/signin" element={<SignInPage />} />
+
+        {/* 🔒 Protected */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoutes>
+              <UserDashboard />
+            </ProtectedRoutes>
+          }
+        />
       </Routes>
 
       <Footer />
-
     </BrowserRouter>
   );
 }

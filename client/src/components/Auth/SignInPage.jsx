@@ -1,12 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import { supabase } from "../../supabase/SupabaseClient";
 
 export default function SignInPage() {
     const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSignin = async () => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        console.log("hello");
+
+        if (error) {
+            if (error.message.toLowerCase().includes("invalid")) {
+                toast.error("Invalid email or password");
+            } else if (error.message.toLowerCase().includes("confirm")) {
+                toast.error("Please verify your email before signing in");
+            } else {
+                toast.error(error.message);
+            }
+            return;
+        }
+
+        // SIGNIN SUCCESS
+        toast.success("Signed in successfully");
+        navigate("/dashboard"); // or home page
+    };
+
+
+    const handleResendConfirmation = async () => {
+        const { error } = await supabase.auth.resend({
+            type: "signup",
+            email,
+        });
+
+        if (error) {
+            toast.error(error.message);
+            return;
+        }
+
+        toast.success("Confirmation email resent. Please check your inbox.");
+    };
+
 
     return (
         <div className="min-h-screen flex">
-
+            <Toaster position="bottom-right"
+                toastOptions={{
+                    style: {
+                        fontFamily: "Poppins, sans-serif",
+                    },
+                }} />
             {/* LEFT – FORM */}
             <div className="w-1/2 flex items-center justify-center">
                 <div className="w-full max-w-md px-10">
@@ -21,16 +70,21 @@ export default function SignInPage() {
                         <input
                             type="email"
                             placeholder="Email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full border font-poppins border-lime-400 rounded-3xl px-4 py-3 focus:bg-lime-200 focus:border-white focus:outline-none"
                         />
 
                         <input
                             type="password"
                             placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full border font-poppins border-lime-400 rounded-3xl px-4 py-3 focus:bg-lime-200 focus:border-white focus:outline-none"
                         />
 
-                        <button className="w-full text-neutral-950 font-poppins bg-lime-200 py-3 rounded-3xl hover:bg-lime-400 transition">
+                        <button className="w-full text-neutral-950 font-poppins bg-lime-200 py-3 rounded-3xl hover:bg-lime-400 transition"
+                            onClick={handleSignin}>
                             Sign in
                         </button>
 
@@ -50,6 +104,17 @@ export default function SignInPage() {
                             Sign up
                         </span>
                     </p>
+
+                    <p className="text-sm font-poppins text-center mt-4">
+                        Didn’t receive the confirmation email ? {" "}
+                        <span
+                            className="text-amber-950 cursor-pointer hover:underline"
+                            onClick={handleResendConfirmation}
+                        >
+                            Resend
+                        </span>
+                    </p>
+
                 </div>
             </div>
 
