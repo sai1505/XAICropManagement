@@ -62,6 +62,20 @@ export default function SignUpPage() {
         toast.success("Check your email for verification");
     };
 
+    const handleGoogleSignIn = async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'http://localhost:5173/dashboard',
+            },
+        })
+
+        if (error) {
+            toast.error(error.message);
+            return;
+        }
+    }
+
 
     return (
         <div className="min-h-screen flex">
@@ -126,7 +140,8 @@ export default function SignUpPage() {
                             Sign up
                         </button>
 
-                        <button className="w-full border border-lime-400 py-3 font-poppins rounded-3xl flex items-center justify-center gap-2 hover:border-2">
+                        <button className="w-full border border-lime-400 py-3 font-poppins rounded-3xl flex items-center justify-center gap-2 hover:border-2"
+                            onClick={handleGoogleSignIn}>
                             <img
                                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                                 className="w-5"

@@ -32,6 +32,20 @@ export default function SignInPage() {
         navigate("/dashboard"); // or home page
     };
 
+    const handleGoogleSignIn = async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'http://localhost:5173/dashboard',
+            },
+        })
+
+        if (error) {
+            toast.error(error.message);
+            return;
+        }
+    }
+
 
     const handleResendConfirmation = async () => {
         const { error } = await supabase.auth.resend({
@@ -88,7 +102,8 @@ export default function SignInPage() {
                             Sign in
                         </button>
 
-                        <button className="w-full border border-lime-400 py-3 font-poppins rounded-3xl flex items-center justify-center gap-2 hover:border-2">
+                        <button className="w-full border border-lime-400 py-3 font-poppins rounded-3xl flex items-center justify-center gap-2 hover:border-2"
+                            onClick={handleGoogleSignIn}>
                             <img
                                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                                 className="w-5"
