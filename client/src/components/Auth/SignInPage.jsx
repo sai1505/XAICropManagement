@@ -1,0 +1,66 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function SignInPage() {
+    const navigate = useNavigate();
+
+    return (
+        <div className="min-h-screen flex">
+
+            {/* LEFT – FORM */}
+            <div className="w-1/2 flex items-center justify-center">
+                <div className="w-full max-w-md px-10">
+                    <h2 className="text-3xl font-poppins-medium mb-2">
+                        Welcome back
+                    </h2>
+                    <p className="text-gray-500 font-poppins mb-8">
+                        Please sign in to your account
+                    </p>
+
+                    <div className="space-y-4">
+                        <input
+                            type="email"
+                            placeholder="Email address"
+                            className="w-full border font-poppins border-lime-400 rounded-3xl px-4 py-3 focus:bg-lime-200 focus:border-white focus:outline-none"
+                        />
+
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            className="w-full border font-poppins border-lime-400 rounded-3xl px-4 py-3 focus:bg-lime-200 focus:border-white focus:outline-none"
+                        />
+
+                        <button className="w-full text-neutral-950 font-poppins bg-lime-200 py-3 rounded-3xl hover:bg-lime-400 transition">
+                            Sign in
+                        </button>
+
+                        <button className="w-full border border-lime-400 py-3 font-poppins rounded-3xl flex items-center justify-center gap-2 hover:border-2">
+                            <img
+                                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                className="w-5"
+                                alt="google"
+                            />
+                            Sign in with Google
+                        </button>
+                    </div>
+
+                    <p className="text-sm font-poppins text-center mt-6">
+                        Don’t have an account?{" "}
+                        <span className="text-amber-950 cursor-pointer" onClick={() => navigate('/signup')}>
+                            Sign up
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            {/* RIGHT – IMAGE */}
+            <div className="w-1/2 bg-white flex items-center justify-center">
+                <img
+                    src="../imgs/XCropAISignIn.jpg"
+                    alt="Signin illustration"
+                    className="max-w-[80%] h-auto"
+                />
+            </div>
+        </div>
+    );
+}

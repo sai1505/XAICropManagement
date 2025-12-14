@@ -431,10 +431,6 @@ export default function HomePage() {
                         <button className="px-8 py-3 rounded-full bg-lime-200 text-black text-md font-poppins-medium hover:bg-lime-400 transition-all duration-300">
                             Try XCropAI
                         </button>
-
-                        <button className="px-8 py-3 rounded-full border border-gray-300 text-gray-800 font-poppins text-md hover:bg-gray-100 transition-all duration-300">
-                            Contact Us
-                        </button>
                     </div>
 
                 </div>
