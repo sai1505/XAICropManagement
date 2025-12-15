@@ -6,29 +6,32 @@ import SignUpPage from "./components/Auth/SignUpPage";
 import SignInPage from "./components/Auth/SignInPage";
 import UserDashboard from "./components/User/UserDashboard";
 import ProtectedRoutes from "./components/Routes/ProtectedRoutes";
+import UserLayout from "./components/Layouts/UserLayout";
+import PublicLayout from "./components/Layouts/PublicLayout";
+import UserProfile from "./components/User/UserProfile";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <NavBar />
-
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/signin" element={<SignInPage />} />
 
-        {/* 🔒 Protected */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoutes>
-              <UserDashboard />
-            </ProtectedRoutes>
-          }
-        />
+        {/* Public */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+        </Route>
+
+        {/* User */}
+        <Route element={<ProtectedRoutes />}>
+          <Route path="dashboard" element={<UserLayout />}>
+            <Route index element={<UserDashboard />} />
+          </Route>
+        </Route>
+
       </Routes>
 
-      <Footer />
+
     </BrowserRouter>
   );
 }
