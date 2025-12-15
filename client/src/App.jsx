@@ -26,6 +26,7 @@ export default function App() {
         <Route element={<ProtectedRoutes />}>
           <Route path="dashboard" element={<UserLayout />}>
             <Route index element={<UserDashboard />} />
+            <Route path="/dashboard/profile" element={<UserProfile />} />
           </Route>
         </Route>
 
