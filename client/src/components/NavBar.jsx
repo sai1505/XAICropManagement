@@ -27,7 +27,7 @@ export default function NavBar() {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 10) setScrolled(true);
+            if (window.scrollY > 400) setScrolled(true);
             else setScrolled(false);
         };
 
@@ -50,7 +50,9 @@ export default function NavBar() {
                 </div>
 
                 {/* Center Links */}
-                <div className="ms-30 hidden md:flex items-center px-49 gap-8 text-gray-800 -mt-1">
+                <div className={`ms-30 hidden md:flex items-center px-49 gap-8 -mt-1 
+                    ${scrolled ? "text-black" : "text-white"}
+                `}>
                     {navLinks.map((link) => (
                         <button
                             key={link.target}
@@ -74,6 +76,6 @@ export default function NavBar() {
                     Sign In
                 </button>
             </div>
-        </nav>
+        </nav >
     );
 }

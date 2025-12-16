@@ -1,23 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import downArrow from "/imgs/XCropAIDownArrow.png"
 import DropDownModern from "../UI/DropDownModern";
 import maleAvatar from "/imgs/avatars/MaleAvatar.svg";
 import femaleAvatar from "/imgs/avatars/FemaleAvatar.svg";
-import XCropAICover1 from "/imgs/covers/XCropAICover1.png";
-import XCropAICover2 from "/imgs/covers/XCropAICover2.png";
-import XCropAICover3 from "/imgs/covers/XCropAICover3.png";
-import XCropAICover4 from "/imgs/covers/XCropAICover4.png";
-import XCropAICover5 from "/imgs/covers/XCropAICover5.png";
+import { supabase } from "../../supabase/SupabaseClient";
 
 export default function UserProfile() {
     const [isEditing, setIsEditing] = useState(false);
-    const [profile, setProfile] = useState({
-        name: "Sai Venkat",
-        email: "user@xcropai.com",
-        role: "Farmer",
-        gender: "Male",
-        cover: "cover1",
-    });
+    const [profile, setProfile] = useState(null);
+    const [selectedCover, setSelectedCover] = useState(null);
+    const [gender, setGender] = useState(null);
+    const [role, setRole] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (!user) return;
+
+            const { data } = await supabase
+                .from("profile")
+                .select("*")
+                .eq("id", user.id)
+                .single();
+
+            setProfile(data);
+        };
+
+        loadProfile();
+    }, []);
+
+    useEffect(() => {
+        if (profile?.cover_image) {
+            setSelectedCover(profile.cover_image);
+        }
+
+        if (profile?.gender) {
+            setGender(profile.gender);
+        }
+
+        if (profile?.role) {
+            setRole(profile.role);
+        }
+    }, [profile]);
 
     const avatarByGender = {
         Male: maleAvatar,
@@ -25,23 +54,59 @@ export default function UserProfile() {
     };
 
     const coverOptions = [
-        { id: "cover1", img: XCropAICover1 },
-        { id: "cover2", img: XCropAICover2 },
-        { id: "cover3", img: XCropAICover3 },
-        { id: "cover4", img: XCropAICover4 },
-        { id: "cover5", img: XCropAICover5 },
+        { img: 'https://wkjyxbuzntwkjpxxxoiu.supabase.co/storage/v1/object/public/profile_covers/XCropAICover1.png' },
+        { img: 'https://wkjyxbuzntwkjpxxxoiu.supabase.co/storage/v1/object/public/profile_covers/XCropAICover2.png' },
+        { img: 'https://wkjyxbuzntwkjpxxxoiu.supabase.co/storage/v1/object/public/profile_covers/XCropAICover3.png' },
+        { img: 'https://wkjyxbuzntwkjpxxxoiu.supabase.co/storage/v1/object/public/profile_covers/XCropAICover4.png' },
+        { img: 'https://wkjyxbuzntwkjpxxxoiu.supabase.co/storage/v1/object/public/profile_covers/XCropAICover5.png' },
     ];
+
+    const updateProfile = async () => {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) return;
+
+        const updates = {
+            'gender': gender,
+            'role': role,
+            'cover_image': selectedCover,
+        };
+
+        const { error } = await supabase
+            .from("profile")
+            .update(updates)
+            .eq("id", user.id);
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        // update UI instantly
+        setProfile(prev => ({ ...prev, ...updates }));
+    };
+
 
 
     return (
         <div className="min-h-screen bg-white">
             {/* Cover */}
-            <div className="relative mt-20 h-76 rounded-b-3xl overflow-hidden">
+            <div className="relative mt-20 h-80 rounded-b-3xl overflow-hidden">
                 <img
-                    src={coverOptions.find(c => c.id === profile.cover)?.img}
+                    src={
+                        isEditing && selectedCover
+                            ? selectedCover
+                            : profile?.cover_image
+                            || coverOptions[0].img
+                    }
                     alt="cover"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
+
+
+                if (!profile) return null;
 
                 {isEditing && (
                     <div className="absolute right-3 top-3 z-50">
@@ -53,21 +118,21 @@ export default function UserProfile() {
                             <div className="flex flex-wrap gap-3">
                                 {coverOptions.map((c) => (
                                     <button
-                                        key={c.id}
-                                        onClick={() => setProfile({ ...profile, cover: c.id })}
+                                        key={c.img}
+                                        onClick={() => setSelectedCover(c.img)}
                                         className={`relative h-16 w-16 rounded-xl overflow-hidden border transition
-                                    ${profile.cover === c.id
+                                    ${selectedCover === c.img
                                                 ? "border-black"
                                                 : "border-neutral-200 hover:border-neutral-400"}`}
                                     >
                                         <img
                                             src={c.img}
-                                            alt={c.id}
+                                            alt={"Covers"}
                                             className="absolute inset-0 w-full h-full object-cover"
                                         />
 
                                         {/* Selected overlay */}
-                                        {profile.cover === c.id && (
+                                        {selectedCover === c.img && (
                                             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                                                 <span className="text-white text-xs font-semibold">
                                                     Selected
@@ -88,15 +153,15 @@ export default function UserProfile() {
                 <div className="bg-white font-poppins rounded-3xl shadow-lg p-6">
                     <div className="flex items-center gap-6">
                         <img
-                            src={avatarByGender[profile.gender]}
+                            src={avatarByGender[gender] || avatarByGender.Male}
                             className="w-28 h-28 rounded-full border-4 border-white -mt-16"
                         />
 
                         <div className="flex-1">
                             <h2 className="text-2xl font-semibold text-gray-900">
-                                {profile.name}
+                                {profile?.display_name}
                             </h2>
-                            <p className="text-gray-500 text-sm">{profile.email}</p>
+                            <p className="text-gray-500 text-sm">{profile?.email}</p>
                         </div>
 
                         <button
@@ -111,23 +176,23 @@ export default function UserProfile() {
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <DropDownModern
                             label="Role"
-                            value={profile.role}
+                            value={role}
                             disabled={!isEditing}
                             options={["Farmer", "Researcher", "Student"]}
                             onChange={(v) => {
                                 if (!isEditing) return;
-                                setProfile({ ...profile, role: v });
+                                setRole(v);
                             }}
                         />
 
                         <DropDownModern
                             label="Gender"
-                            value={profile.gender}
+                            value={gender}
                             disabled={!isEditing}
                             options={["Male", "Female"]}
                             onChange={(v) => {
                                 if (!isEditing) return;
-                                setProfile({ ...profile, gender: v });
+                                setGender(v);
                             }}
                         />
                     </div>
@@ -135,13 +200,27 @@ export default function UserProfile() {
                     {isEditing && (
                         <div className="mt-8 flex justify-end gap-4">
                             <button
-                                onClick={() => setIsEditing(false)}
-                                className="px-5 py-2 rounded-3xl bg-lime-200 hover:bg-lime-400"
+                                disabled={isSaving}
+                                onClick={async () => {
+                                    setIsSaving(true);
+                                    try {
+                                        await updateProfile();
+                                        setIsEditing(false);
+                                    } finally {
+                                        setIsSaving(false);
+                                    }
+                                }}
+                                className={`px-5 py-2 rounded-3xl transition
+        ${isSaving
+                                        ? "bg-gray-300 cursor-not-allowed"
+                                        : "bg-lime-200 hover:bg-lime-400"
+                                    }`}
                             >
-                                Save Changes
+                                {isSaving ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
                     )}
+
 
                     {/* Logout */}
                     <div className="mt-10 border-t border-neutral-400 pt-6">

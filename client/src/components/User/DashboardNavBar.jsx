@@ -7,11 +7,11 @@ import leafAnim from "../../assets/LeafAnim.json";
 import { supabase } from "../../supabase/SupabaseClient";
 
 const navLinks = [
-    { name: "New Chat" },
-    { name: "Analytics" },
-    { name: "History" },
-    { name: "Images" },
-    { name: "Profile" },
+    { name: "New Chat", target: "" },
+    { name: "Analytics", target: "analytics" },
+    { name: "History", target: "history" },
+    { name: "Images", target: "images" },
+    { name: "Profile", target: "profile" },
 ];
 
 export default function DashboardNavBar() {
@@ -58,6 +58,7 @@ export default function DashboardNavBar() {
                     {navLinks.map((link) => (
                         <button
                             className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors"
+                            onClick={() => navigate(link.target)}
                         >
                             {link.name}
                         </button>
