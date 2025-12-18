@@ -3,3 +3,8 @@ client/node_modules
 .env.*
 client/.env
 client/.env.*
+XAICropManagementAiService/.env
+XAICropManagementAiService/.env.*
+XAICropManagementAiService/venv
+XAICropManagementAiService/__pycache__
+XAICropManagementAiService/outputs
