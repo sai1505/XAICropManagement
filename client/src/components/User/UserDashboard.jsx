@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
 
-/* ===================== MAIN ===================== */
+/* MAIN */
 export default function XCropAIChat() {
     const [image, setImage] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -42,34 +42,33 @@ export default function XCropAIChat() {
 
 }
 
-/* ===================== UPLOAD ===================== */
+/* UPLOAD */
 function ImageUpload({ onUpload }) {
     return (
         <div className="flex-1 flex items-center justify-center px-4">
-            <label className="w-full max-w-xl border-2 border-dashed rounded-3xl p-10 text-center cursor-pointer hover:border-lime-400 transition">
+            <label className="w-full max-w-xl border-2 border-neutral-200 rounded-3xl px-40 py-30 text-center cursor-pointer hover:border-lime-400 transition">
                 <Upload className="mx-auto text-lime-500" size={36} />
                 <p className="mt-4 font-poppins">Upload plant image</p>
-                <p className="text-sm text-gray-400">Recommended 1024×1024</p>
+                <p className="text-sm font-poppins text-gray-400">Recommended 1024×1024</p>
                 <input type="file" accept="image/*" hidden onChange={(e) => onUpload(e.target.files[0])} />
             </label>
         </div>
     );
 }
 
-/* ===================== ANALYSIS FLOW ===================== */
+/* ANALYSIS FLOW */
 function AnalysisFlow({ image }) {
     return (
         <div className="px-4 py-10 mt-30 space-y-10 max-w-5xl mx-auto pb-32">
             <ImageFlow image={image} />
             <Insights />
             <Actions />
-            <FAQs />
         </div>
     );
 }
 
 
-/* ===================== IMAGE FLOW ===================== */
+/* IMAGE FLOW */
 function ImageFlow({ image }) {
     return (
         <div className="grid md:grid-cols-3 gap-6">
@@ -94,7 +93,7 @@ function ImageCard({ title, image, icon, overlay }) {
     );
 }
 
-/* ===================== INSIGHTS ===================== */
+/* INSIGHTS */
 function Insights() {
     return (
         <div className="rounded-3xl bg-lime-50 p-6 space-y-4">
@@ -115,13 +114,13 @@ function Stat({ label, value }) {
     );
 }
 
-/* ===================== ACTIONS ===================== */
+/* ACTIONS */
 function Actions() {
     const items = ["Immediate Treatment", "Preventive Measures", "Long-term Care"];
     return (
         <div className="grid md:grid-cols-3 gap-4">
             {items.map((i) => (
-                <div key={i} className="rounded-2xl border p-5 font-poppins hover:bg-lime-50 transition">
+                <div key={i} className="rounded-3xl border border-neutral-300 p-5 font-poppins hover:bg-lime-50 outline-none transition-colors">
                     {i}
                 </div>
             ))}
@@ -129,22 +128,7 @@ function Actions() {
     );
 }
 
-/* ===================== FAQ ===================== */
-function FAQs() {
-    const faqs = ["Is this harmful?", "Will yield reduce?", "Best treatment time?"];
-    return (
-        <div className="space-y-3">
-            <h3 className="font-poppins-medium">FAQs</h3>
-            {faqs.map((q) => (
-                <div key={q} className="flex items-center gap-3 text-sm border p-4 rounded-xl">
-                    <HelpCircle size={16} /> {q}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-/* ===================== CHAT ===================== */
+/* CHAT */
 function ChatUI({ messages, input, setInput, onSend }) {
     const bottomRef = useRef(null);
 
@@ -156,14 +140,14 @@ function ChatUI({ messages, input, setInput, onSend }) {
     return (
         <>
             {/* CHAT MESSAGES — PART OF MAIN SCROLL */}
-            <div className="px-4 py-6 max-w-5xl mx-auto space-y-4">
+            <div className="px-4 py-6 max-w-5xl mx-auto space-y-4 font-poppins">
                 {messages.map((m, i) => (
                     <div
                         key={i}
                         className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                         <div
-                            className={`px-4 py-3 rounded-2xl text-sm max-w-[75%]
+                            className={`px-4 py-3 rounded-3xl text-sm max-w-[75%]
               ${m.role === "user" ? "bg-lime-200" : "bg-gray-100"}`}
                         >
                             {m.content}
@@ -176,23 +160,20 @@ function ChatUI({ messages, input, setInput, onSend }) {
             </div>
 
             {/* INPUT — STICKY */}
-            <div className="sticky bottom-0 bg-white border-t px-4 py-3">
+            <div className="sticky bottom-0 bg-white px-4 py-3 font-poppins">
                 <div className="max-w-5xl mx-auto flex gap-3 items-center">
-                    <button className="text-lime-600">
-                        <ImageIcon />
-                    </button>
 
                     <input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && onSend()}
                         placeholder="Ask about this crop…"
-                        className="flex-1 border rounded-xl px-4 py-3 text-sm focus:outline-none"
+                        className="flex-1 border border-neutral-400 rounded-3xl px-4 py-3 text-sm focus:outline-none"
                     />
 
                     <button
                         onClick={onSend}
-                        className="bg-lime-400 px-5 py-3 rounded-xl"
+                        className="bg-lime-300 px-6 py-4 rounded-3xl hover:bg-lime-400"
                     >
                         <Send size={16} />
                     </button>
