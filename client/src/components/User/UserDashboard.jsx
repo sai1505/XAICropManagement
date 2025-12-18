@@ -1,127 +1,203 @@
-import { useState } from "react";
-import { Send, Image as ImageIcon } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
 
+/* ===================== MAIN ===================== */
 export default function XCropAIChat() {
+    const [image, setImage] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
 
+    const handleUpload = (file) => {
+        setImage(URL.createObjectURL(file));
+        setStage("analysis");
+    };
+
     const handleSend = () => {
         if (!input.trim()) return;
-
-        setMessages((prev) => [
-            ...prev,
-            { role: "user", content: input },
-            {
-                role: "ai",
-                content:
-                    "I can help analyze plant diseases, treatments, and prevention steps. Please upload an image or describe the issue.",
-            },
-        ]);
+        setMessages((prev) => [...prev, { role: "user", content: input }, { role: "ai", content: "Here’s more guidance based on the detected crop condition." }]);
         setInput("");
     };
 
-    const isEmpty = messages.length === 0;
-
     return (
         <div className="h-screen bg-white flex flex-col">
-            {/* CONTENT */}
-            <div className="flex-1 overflow-y-auto px-4">
-                {isEmpty ? (
+            {!image && <ImageUpload onUpload={handleUpload} />}
 
-                    /* INITIAL STATE */
-                    <div className="min-h-full flex items-center justify-center">
-                        <div className="max-w-xl w-full text-center space-y-6 flex flex-col">
-                            <div className="mx-auto w-16 h-16 rounded-full bg-lime-500/20 flex items-center justify-center shadow-lg">
-                                <span className="text-lime-400 text-2xl">🌱</span>
-                            </div>
+            {image && (
+                <div className="flex-1 overflow-y-auto">
+                    {/* ANALYSIS */}
+                    <AnalysisFlow image={image} />
 
-                            <h1 className="text-2xl font-poppins-medium">
-                                Hi <span className="text-lime-600">Battula</span>
-                            </h1>
-                            <p className="text-gray-400 font-poppins">
-                                What would you like to analyze today?
-                            </p>
-
-                            {/* INPUT */}
-                            <div className="relative">
-                                <input
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                                    placeholder="Ask about a plant disease, treatment, or prevention…"
-                                    className="w-full font-poppins bg-white/10 backdrop-blur border border-neutral-300 rounded-3xl px-4 py-3 pr-12 text-sm focus:outline-none"
-                                />
-                                <button
-                                    onClick={handleSend}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-lime-600 hover:text-lime-500"
-                                >
-                                    <Send size={17} />
-                                </button>
-                            </div>
-
-                            {/* QUICK ACTIONS */}
-                            <div className="flex flex-wrap justify-center gap-3 pt-2">
-                                {["Detect Plant Disease", "Treatment Advice", "Prevention Tips", "Upload Image"].map(
-                                    (item) => (
-                                        <button
-                                            key={item}
-                                            className="font-poppins px-5 py-1.5 text-sm rounded-full border border-neutral-200 text-black hover:bg-lime-500 hover:text-black transition"
-                                        >
-                                            {item}
-                                        </button>
-                                    )
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    /* CHAT STATE */
-                    <div className="w-full mt-15 max-w-3xl mx-auto space-y-6 py-6 pb-28">
-                        {messages.map((msg, idx) => (
-                            <div
-                                key={idx}
-                                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                                    }`}
-                            >
-                                <div
-                                    className={`max-w-[75%] px-4 py-3 font-poppins rounded-3xl text-sm leading-relaxed shadow ${msg.role === "user"
-                                        ? "bg-lime-200 text-black"
-                                        : "bg-lime-50 text-gray-900"
-                                        }`}
-                                >
-                                    {msg.content}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* INPUT BAR (PERSISTENT) */}
-            {!isEmpty && (
-                <div className="sticky bottom-0 w-full bg-white px-4 py-4">
-                    <div className="max-w-3xl mx-auto flex items-center gap-3">
-                        <button className="text-lime-600 hover:text-lime-500">
-                            <ImageIcon size={22} />
-                        </button>
-
-                        <input
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                            placeholder="Type your message…"
-                            className="font-poppins flex-1 bg-white/10 border border-neutral-200 rounded-2xl px-4 py-3 text-sm focus:outline-none"
-                        />
-
-                        <button
-                            onClick={handleSend}
-                            className="bg-lime-300 hover:bg-lime-400 text-black rounded-xl px-5 py-3 transition"
-                        >
-                            <Send size={18} />
-                        </button>
-                    </div>
+                    {/* CHAT (PART OF SCROLL) */}
+                    <ChatUI
+                        messages={messages}
+                        input={input}
+                        setInput={setInput}
+                        onSend={handleSend}
+                    />
                 </div>
             )}
         </div>
+
+    );
+
+}
+
+/* ===================== UPLOAD ===================== */
+function ImageUpload({ onUpload }) {
+    return (
+        <div className="flex-1 flex items-center justify-center px-4">
+            <label className="w-full max-w-xl border-2 border-dashed rounded-3xl p-10 text-center cursor-pointer hover:border-lime-400 transition">
+                <Upload className="mx-auto text-lime-500" size={36} />
+                <p className="mt-4 font-poppins">Upload plant image</p>
+                <p className="text-sm text-gray-400">Recommended 1024×1024</p>
+                <input type="file" accept="image/*" hidden onChange={(e) => onUpload(e.target.files[0])} />
+            </label>
+        </div>
+    );
+}
+
+/* ===================== ANALYSIS FLOW ===================== */
+function AnalysisFlow({ image }) {
+    return (
+        <div className="px-4 py-10 mt-30 space-y-10 max-w-5xl mx-auto pb-32">
+            <ImageFlow image={image} />
+            <Insights />
+            <Actions />
+            <FAQs />
+        </div>
+    );
+}
+
+
+/* ===================== IMAGE FLOW ===================== */
+function ImageFlow({ image }) {
+    return (
+        <div className="grid md:grid-cols-3 gap-6">
+            <ImageCard title="Original" image={image} />
+            <ImageCard title="Enhanced" image={image} icon={<Sparkles size={16} />} />
+            <ImageCard title="Pseudo Thermal" image={image} icon={<Thermometer size={16} />} overlay />
+        </div>
+    );
+}
+
+function ImageCard({ title, image, icon, overlay }) {
+    return (
+        <div className="rounded-2xl overflow-hidden shadow">
+            <div className="relative">
+                <img src={image} alt={title} className="w-full h-48 object-cover" />
+                {overlay && <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-blue-500/30" />}
+            </div>
+            <div className="p-4 flex items-center gap-2 font-poppins text-sm">
+                {icon} {title}
+            </div>
+        </div>
+    );
+}
+
+/* ===================== INSIGHTS ===================== */
+function Insights() {
+    return (
+        <div className="rounded-3xl bg-lime-50 p-6 space-y-4">
+            <h2 className="font-poppins-medium text-lg">AI Findings</h2>
+            <Stat label="Disease" value="Leaf Spot (Moderate)" />
+            <Stat label="Affected Area" value="32%" />
+            <Stat label="Confidence" value="91%" />
+        </div>
+    );
+}
+
+function Stat({ label, value }) {
+    return (
+        <div className="flex justify-between text-sm font-poppins">
+            <span className="text-gray-500">{label}</span>
+            <span>{value}</span>
+        </div>
+    );
+}
+
+/* ===================== ACTIONS ===================== */
+function Actions() {
+    const items = ["Immediate Treatment", "Preventive Measures", "Long-term Care"];
+    return (
+        <div className="grid md:grid-cols-3 gap-4">
+            {items.map((i) => (
+                <div key={i} className="rounded-2xl border p-5 font-poppins hover:bg-lime-50 transition">
+                    {i}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+/* ===================== FAQ ===================== */
+function FAQs() {
+    const faqs = ["Is this harmful?", "Will yield reduce?", "Best treatment time?"];
+    return (
+        <div className="space-y-3">
+            <h3 className="font-poppins-medium">FAQs</h3>
+            {faqs.map((q) => (
+                <div key={q} className="flex items-center gap-3 text-sm border p-4 rounded-xl">
+                    <HelpCircle size={16} /> {q}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+/* ===================== CHAT ===================== */
+function ChatUI({ messages, input, setInput, onSend }) {
+    const bottomRef = useRef(null);
+
+    // AUTO SCROLL WHEN MESSAGES CHANGE
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    return (
+        <>
+            {/* CHAT MESSAGES — PART OF MAIN SCROLL */}
+            <div className="px-4 py-6 max-w-5xl mx-auto space-y-4">
+                {messages.map((m, i) => (
+                    <div
+                        key={i}
+                        className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                        <div
+                            className={`px-4 py-3 rounded-2xl text-sm max-w-[75%]
+              ${m.role === "user" ? "bg-lime-200" : "bg-gray-100"}`}
+                        >
+                            {m.content}
+                        </div>
+                    </div>
+                ))}
+
+                {/* SCROLL TARGET */}
+                <div ref={bottomRef} />
+            </div>
+
+            {/* INPUT — STICKY */}
+            <div className="sticky bottom-0 bg-white border-t px-4 py-3">
+                <div className="max-w-5xl mx-auto flex gap-3 items-center">
+                    <button className="text-lime-600">
+                        <ImageIcon />
+                    </button>
+
+                    <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && onSend()}
+                        placeholder="Ask about this crop…"
+                        className="flex-1 border rounded-xl px-4 py-3 text-sm focus:outline-none"
+                    />
+
+                    <button
+                        onClick={onSend}
+                        className="bg-lime-400 px-5 py-3 rounded-xl"
+                    >
+                        <Send size={16} />
+                    </button>
+                </div>
+            </div>
+        </>
     );
 }
