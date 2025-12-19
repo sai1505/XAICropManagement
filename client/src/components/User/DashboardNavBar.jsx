@@ -41,9 +41,7 @@ export default function DashboardNavBar() {
 
     return (
         <nav
-            className={`group -mt-3 fixed top-0 w-full h-20 z-20 px-8 transition-colors 
-                ${scrolled ? "bg-gray-100/30 backdrop-blur-sm shadow-xs" : "bg-transparent"}
-            `}
+            className="group -mt-3 fixed top-0 w-full h-20 z-20 px-8 transition-colors bg-gray-100/30 backdrop-blur-sm shadow-xs"
         >
 
             <div className="relative w-full flex items-center px-6 py-4" >

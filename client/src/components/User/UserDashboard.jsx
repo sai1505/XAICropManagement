@@ -2,32 +2,56 @@ import { useState, useRef, useEffect } from "react";
 import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
 
 /* MAIN */
-export default function XCropAIChat() {
+export default function UserDashboard() {
     const [image, setImage] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const [crop, setCrop] = useState("");
 
     const handleUpload = (file) => {
         setImage(URL.createObjectURL(file));
-        setStage("analysis");
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file || !crop.trim()) return;
+        handleUpload(file);
     };
 
     const handleSend = () => {
         if (!input.trim()) return;
-        setMessages((prev) => [...prev, { role: "user", content: input }, { role: "ai", content: "Here’s more guidance based on the detected crop condition." }]);
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", content: input },
+            { role: "ai", content: "Here’s more guidance based on the detected crop condition." }
+        ]);
         setInput("");
     };
 
     return (
         <div className="h-screen bg-white flex flex-col">
-            {!image && <ImageUpload onUpload={handleUpload} />}
+
+            {!image && (
+                <ImageUpload
+                    crop={crop}
+                    setCrop={setCrop}
+                    handleFileChange={handleFileChange}
+                />
+            )}
 
             {image && (
                 <div className="flex-1 overflow-y-auto">
-                    {/* ANALYSIS */}
+                    <div className="mt-20 flex justify-center">
+                        <h1
+                            className="mt-5 inline-flex px-6 py-2 bg-lime-200 text-2xl font-poppins-medium rounded-3xl text-center"
+                        >
+                            {crop} Analysis
+                        </h1>
+                    </div>
+
+
                     <AnalysisFlow image={image} />
 
-                    {/* CHAT (PART OF SCROLL) */}
                     <ChatUI
                         messages={messages}
                         input={input}
@@ -43,23 +67,42 @@ export default function XCropAIChat() {
 }
 
 /* UPLOAD */
-function ImageUpload({ onUpload }) {
+function ImageUpload({ crop, setCrop, handleFileChange }) {
     return (
-        <div className="flex-1 flex items-center justify-center px-4">
-            <label className="w-full max-w-xl border-2 border-neutral-200 rounded-3xl px-40 py-30 text-center cursor-pointer hover:border-lime-400 transition">
-                <Upload className="mx-auto text-lime-500" size={36} />
-                <p className="mt-4 font-poppins">Upload plant image</p>
-                <p className="text-sm font-poppins text-gray-400">Recommended 1024×1024</p>
-                <input type="file" accept="image/*" hidden onChange={(e) => onUpload(e.target.files[0])} />
-            </label>
+        <div className="flex-1 flex items-center justify-center px-4 font-poppins">
+            <div className="w-full max-w-xl text-center space-y-6">
+
+                <input
+                    type="text"
+                    placeholder="Enter crop name (e.g., Potato)"
+                    value={crop}
+                    onChange={(e) => setCrop(e.target.value)}
+                    className="w-full px-6 py-4 rounded-2xl border border-neutral-200
+                               focus:outline-none focus:ring-2 focus:ring-lime-400"
+                />
+
+                <label className="block border-2 border-neutral-200 rounded-3xl
+                                  px-24 py-20 cursor-pointer hover:border-lime-400">
+                    <Upload className="mx-auto text-lime-500" size={36} />
+                    <p className="mt-4">Upload plant image</p>
+
+                    <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={handleFileChange}
+                    />
+                </label>
+            </div>
         </div>
     );
 }
 
+
 /* ANALYSIS FLOW */
 function AnalysisFlow({ image }) {
     return (
-        <div className="px-4 py-10 mt-30 space-y-10 max-w-5xl mx-auto pb-32">
+        <div className="px-4 py-10 space-y-10 max-w-5xl mx-auto pb-32">
             <ImageFlow image={image} />
             <Insights />
             <Actions />
