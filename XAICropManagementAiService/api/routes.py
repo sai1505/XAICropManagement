@@ -8,7 +8,7 @@ from datetime import datetime
 from services.thermal import rgb_to_pseudo_thermal
 from services.stress import detect_stress
 from services.stats import generate_plant_stats
-from services.llm import ask_groq_for_analysis, ask_groq_for_prevention
+from services.llm import ask_groq_followup, ask_groq_for_analysis, ask_groq_for_prevention
 from core.config import OUTPUT_DIR
 
 router = APIRouter(prefix="/analyze", tags=["Plant Analysis"])
@@ -89,3 +89,14 @@ async def analyze_plant(
             "generated_at": datetime.utcnow().isoformat()
         }
     }
+
+@router.post("/chat")
+async def follow_up_chat(payload: dict):
+    name = payload.get("name", "the plant")  # 👈 SAFE DEFAULT
+
+    return ask_groq_followup(
+        name,
+        payload["stats"],
+        payload.get("previous_response", ""),
+        payload["question"]
+    )

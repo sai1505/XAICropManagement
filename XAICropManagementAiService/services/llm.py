@@ -106,30 +106,35 @@ def build_prevention_payload(name: str, stats: dict) -> dict:
 
 def build_prevention_prompt(payload: dict) -> str:
     return f"""
-You are a plant care and prevention assistant.
+    You are an experienced plant care and prevention assistant.
 
-You are given VERIFIED plant health analytics.
-Your task is to suggest PREVENTIVE CARE actions.
+    You are given VERIFIED plant health analytics derived from image analysis.
+    Your task is to explain what is happening to the plant and guide the user
+    on how to prevent further stress or damage.
 
-Rules:
-- Do NOT invent numbers
-- Do NOT claim exact diseases
-- Do NOT give chemical dosages
-- Use cautious language (e.g., "may help", "often recommended")
-- Focus on prevention, not cure
+    Guidelines:
+    - Start with a clear, human-style paragraph explaining the plant’s current condition
+    - Then provide prevention steps and necessary cautions as clear points
+    - Keep the tone natural and supportive, not robotic
+    - Do NOT invent numbers
+    - Do NOT claim exact diseases
+    - Do NOT give chemical dosages
+    - Focus on prevention, care, and early recovery
+    - Assume the user may ask follow-up questions
 
-INPUT DATA:
-{json.dumps(payload, indent=2)}
+    Plant health data:
+    {json.dumps(payload, indent=2)}
 
-Respond ONLY in valid JSON:
-{{
-  "possible_causes": [],
-  "prevention_steps": [],
-  "care_routine_adjustments": [],
-  "environmental_tips": [],
-  "warning_signs_to_watch": []
-}}
-"""
+    Respond ONLY in valid JSON in this format:
+    {{
+    "overall_assessment": "",
+    "prevention_steps": [],
+    "necessary_cautions": []
+    }}
+    """
+
+
+
 
 def ask_groq_for_prevention(name: str, stats: dict) -> dict:
     payload = build_prevention_payload(name, stats)
@@ -152,3 +157,53 @@ def ask_groq_for_prevention(name: str, stats: dict) -> dict:
     )
 
     return safe_json_parse(completion.choices[0].message.content)
+
+def build_followup_prompt(name, stats, previous_response, user_question):
+    return f"""
+    You are continuing a plant care conversation.
+
+    Context:
+    - Plant name: {name}
+    - Previously analyzed plant health data is provided
+    - The user is asking a follow-up question
+
+    Rules:
+    - Do NOT invent numbers
+    - Do NOT re-diagnose from scratch
+    - Use the existing plant health context
+    - Answer conversationally and clearly
+    - Keep it practical and focused on the user's question
+    - Your response should be at least 2 detailed paragraphs.
+
+    Plant health data:
+    {json.dumps(stats, indent=2)}
+
+    Previous response:
+    {previous_response}
+
+    User question:
+    "{user_question}"
+
+    Respond ONLY in valid JSON:
+    {{
+    "response": "..."
+    }}
+    """
+
+def ask_groq_followup(name, stats, previous_response, user_question):
+    prompt = build_followup_prompt(
+        name, stats, previous_response, user_question
+    )
+
+    completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": "You are a helpful plant care assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+        max_tokens=1200
+    )
+
+    return safe_json_parse(completion.choices[0].message.content)
+
