@@ -4,7 +4,6 @@ import os
 import shutil
 import numpy as np
 from datetime import datetime
-
 from services.thermal import rgb_to_pseudo_thermal
 from services.stress import detect_stress
 from services.stats import generate_plant_stats
@@ -39,7 +38,9 @@ async def analyze_plant(
     # --------------------------------------------------
     # Convert thermal to grayscale for mask generation
     gray, thermal = rgb_to_pseudo_thermal(image_path)
-    stress_percentage = detect_stress(gray, thermal)
+    stress_result = detect_stress(gray, thermal)
+    stress_percentage = stress_result["stress_percentage"]
+    stress_images = stress_result["images"]
 
     # Ensure gray is 2D (already is, but safe)
     if gray.ndim == 3:

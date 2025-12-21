@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 from core.config import OUTPUT_DIR
+import base64
+
+def encode_image(img):
+    _, buffer = cv2.imencode(".png", img)
+    return base64.b64encode(buffer).decode("utf-8")
+
 
 def detect_stress(enhanced_gray, thermal_img):
     threshold = int(0.65 * 255)
@@ -16,7 +22,10 @@ def detect_stress(enhanced_gray, thermal_img):
     overlay = thermal_img.copy()
     overlay[mask == 255] = [0, 0, 255]
 
-    cv2.imwrite(f"{OUTPUT_DIR}/stress_mask.png", mask)
-    cv2.imwrite(f"{OUTPUT_DIR}/stress_overlay.png", overlay)
-
-    return percentage
+    return {
+        "stress_percentage": percentage,
+        "images": {
+            "enhanced": encode_image(enhanced_gray),
+            "thermal": encode_image(thermal_img),
+        }
+    }

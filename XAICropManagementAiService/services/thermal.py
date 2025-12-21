@@ -1,5 +1,7 @@
 import cv2
 from core.config import IMAGE_SIZE, OUTPUT_DIR
+import os
+import re
 
 def rgb_to_pseudo_thermal(image_path: str):
     img = cv2.imread(image_path)
@@ -14,7 +16,17 @@ def rgb_to_pseudo_thermal(image_path: str):
 
     thermal = cv2.applyColorMap(enhanced, cv2.COLORMAP_INFERNO)
 
-    cv2.imwrite(f"{OUTPUT_DIR}/gray.png", gray)
-    cv2.imwrite(f"{OUTPUT_DIR}/thermal.png", thermal)
+    # 🔹 filename handling
+    filename = os.path.basename(image_path)
+    name, ext = os.path.splitext(filename)
+
+    # sanitize (important)
+    safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name)
+
+    gray_path = os.path.join(OUTPUT_DIR, f"{safe_name}_gray{ext}")
+    thermal_path = os.path.join(OUTPUT_DIR, f"{safe_name}_thermal{ext}")
+
+    cv2.imwrite(gray_path, gray)
+    cv2.imwrite(thermal_path, thermal)
 
     return enhanced, thermal
