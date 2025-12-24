@@ -1,5 +1,5 @@
 import cv2
-from core.config import IMAGE_SIZE, OUTPUT_DIR
+from core.config import OUTPUT_DIR
 import os
 import re
 
@@ -8,7 +8,6 @@ def rgb_to_pseudo_thermal(image_path: str):
     if img is None:
         raise ValueError("Image not found")
 
-    img = cv2.resize(img, IMAGE_SIZE)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     clahe = cv2.createCLAHE(3.0, (8, 8))

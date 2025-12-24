@@ -7,10 +7,23 @@ export default function UserDashboard() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [crop, setCrop] = useState("");
+    const [analysis, setAnalysis] = useState(null);
 
-    const handleUpload = (file) => {
-        setImage(URL.createObjectURL(file));
+    const handleUpload = async (file) => {
+        if (!crop.trim()) return;
+        const formData = new FormData();
+        formData.append("name", crop);
+        formData.append("image", file);
+
+        const res = await fetch("http://localhost:8000/api/analyze", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await res.json();
+        setAnalysis(data);
     };
+
+    const imgSrc = (b64) => `data:image/png;base64,${b64}`;
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -31,7 +44,7 @@ export default function UserDashboard() {
     return (
         <div className="h-screen bg-white flex flex-col">
 
-            {!image && (
+            {!analysis && (
                 <ImageUpload
                     crop={crop}
                     setCrop={setCrop}
@@ -39,7 +52,7 @@ export default function UserDashboard() {
                 />
             )}
 
-            {image && (
+            {analysis && (
                 <div className="flex-1 overflow-y-auto">
                     <div className="mt-20 flex justify-center">
                         <h1
@@ -50,7 +63,14 @@ export default function UserDashboard() {
                     </div>
 
 
-                    <AnalysisFlow image={image} />
+                    <AnalysisFlow
+                        image={{
+                            original: imgSrc(analysis.images.original),
+                            enhanced: imgSrc(analysis.images.enhanced),
+                            thermal: imgSrc(analysis.images.thermal),
+                        }}
+                        stats={analysis.stats}
+                    />
 
                     <ChatUI
                         messages={messages}
@@ -100,11 +120,11 @@ function ImageUpload({ crop, setCrop, handleFileChange }) {
 
 
 /* ANALYSIS FLOW */
-function AnalysisFlow({ image }) {
+function AnalysisFlow({ image, stats }) {
     return (
         <div className="px-4 py-10 space-y-10 max-w-5xl mx-auto pb-32">
             <ImageFlow image={image} />
-            <Insights />
+            <Insights stats={stats} />
             <Actions />
         </div>
     );
@@ -115,9 +135,9 @@ function AnalysisFlow({ image }) {
 function ImageFlow({ image }) {
     return (
         <div className="grid md:grid-cols-3 gap-6">
-            <ImageCard title="Original" image={image} />
-            <ImageCard title="Enhanced" image={image} icon={<Sparkles size={16} />} />
-            <ImageCard title="Pseudo Thermal" image={image} icon={<Thermometer size={16} />} overlay />
+            <ImageCard title="Original" image={image.original} />
+            <ImageCard title="Enhanced" image={image.enhanced} icon={<Sparkles size={16} />} />
+            <ImageCard title="Pseudo Thermal" image={image.thermal} icon={<Thermometer size={16} />} overlay />
         </div>
     );
 }
@@ -127,7 +147,6 @@ function ImageCard({ title, image, icon, overlay }) {
         <div className="rounded-2xl overflow-hidden shadow">
             <div className="relative">
                 <img src={image} alt={title} className="w-full h-48 object-cover" />
-                {overlay && <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-blue-500/30" />}
             </div>
             <div className="p-4 flex items-center gap-2 font-poppins text-sm">
                 {icon} {title}
@@ -137,16 +156,21 @@ function ImageCard({ title, image, icon, overlay }) {
 }
 
 /* INSIGHTS */
-function Insights() {
+function Insights({ stats }) {
+    const health = stats.plant_health;
+
     return (
         <div className="rounded-3xl bg-lime-50 p-6 space-y-4">
             <h2 className="font-poppins-medium text-lg">AI Findings</h2>
-            <Stat label="Disease" value="Leaf Spot (Moderate)" />
-            <Stat label="Affected Area" value="32%" />
-            <Stat label="Confidence" value="91%" />
+
+            <Stat label="Disease Stage" value={health.disease_stage} />
+            <Stat label="Stress %" value={`${health.stress_percentage}%`} />
+            <Stat label="Care Urgency" value={health.care_urgency} />
+            <Stat label="Recovery Potential" value={health.recovery_potential} />
         </div>
     );
 }
+
 
 function Stat({ label, value }) {
     return (
