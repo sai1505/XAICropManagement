@@ -70,6 +70,7 @@ export default function UserDashboard() {
                             thermal: imgSrc(analysis.images.thermal),
                         }}
                         stats={analysis.stats}
+                        analysis={analysis}
                     />
 
                     <ChatUI
@@ -120,12 +121,11 @@ function ImageUpload({ crop, setCrop, handleFileChange }) {
 
 
 /* ANALYSIS FLOW */
-function AnalysisFlow({ image, stats }) {
+function AnalysisFlow({ image, stats, analysis }) {
     return (
         <div className="px-4 py-10 space-y-10 max-w-5xl mx-auto pb-32">
             <ImageFlow image={image} />
-            <Insights stats={stats} />
-            <Actions />
+            <Insights stats={stats} llm={analysis.llm_analysis} prevention={analysis.prevention} />
         </div>
     );
 }
@@ -156,17 +156,97 @@ function ImageCard({ title, image, icon, overlay }) {
 }
 
 /* INSIGHTS */
-function Insights({ stats }) {
+function Insights({ stats, llm, prevention }) {
     const health = stats.plant_health;
+    const imageAnalysis = stats.image_analysis;
 
     return (
-        <div className="rounded-3xl bg-lime-50 p-6 space-y-4">
-            <h2 className="font-poppins-medium text-lg">AI Findings</h2>
+        <div className="space-y-6">
+            {/* EXISTING STATS */}
+            <div className="rounded-3xl bg-lime-50 p-6 space-y-4">
+                <h2 className="font-poppins-medium text-lg">AI Findings</h2>
 
-            <Stat label="Disease Stage" value={health.disease_stage} />
-            <Stat label="Stress %" value={`${health.stress_percentage}%`} />
-            <Stat label="Care Urgency" value={health.care_urgency} />
-            <Stat label="Recovery Potential" value={health.recovery_potential} />
+                <Stat label="Disease Stage" value={health.disease_stage} />
+                <Stat label="Stress %" value={`${health.stress_percentage}%`} />
+                <Stat label="Care Urgency" value={health.care_urgency} />
+                <Stat label="Recovery Potential" value={health.recovery_potential} />
+                <Stat label="Infected Area" value={imageAnalysis.infected_area_percent} />
+                <Stat label="Life Expectancy" value={health.life_expectancy_band} />
+                <Stat label="Health Score" value={health.health_score} />
+                <Stat label="Survivability Score" value={health.survivability_score} />
+            </div>
+
+            {/* LLM EXPLANATION — CHAT STYLE */}
+            {llm && (
+                <div className="flex justify-start">
+                    <div className="text-gray-700 px-5 py-4 rounded-3xl space-y-3 text-[15px] font-poppins leading-relaxed">
+                        <p className="font-poppins-medium text-xl">
+                            AI Explanation
+                        </p>
+
+                        <p className="leading-relaxed">{llm.explanation}</p>
+
+                        <div className="space-y-2">
+                            <p className="text-gray-800">
+                                <span className="font-poppins-medium">Future Trend:</span>{" "}
+                                {llm.future_trend}
+                            </p>
+
+                            <p className="text-gray-800">
+                                <span className="font-poppins-medium">Confidence:</span>{" "}
+                                {llm.confidence_level}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {prevention && (
+                <div className="flex justify-start -mt-9">
+                    <div className="px-5 py-4 rounded-3xl font-poppins text-[15px] space-y-3 leading-relaxed">
+
+                        <div className="space-y-2" >
+                            <p className="font-poppins-medium">
+                                Prevention & Care Guidance
+                            </p>
+                            {/* OVERALL ASSESSMENT */}
+                            <p className="text-gray-700">
+                                {prevention.overall_assessment}
+                            </p>
+                        </div>
+
+
+                        {/* PREVENTION STEPS */}
+                        {prevention.prevention_steps?.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="font-poppins-medium text-gray-800">
+                                    Recommended Actions
+                                </p>
+                                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                    {prevention.prevention_steps.map((step, i) => (
+                                        <li key={i}>{step}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* CAUTIONS */}
+                        {prevention.necessary_cautions?.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="font-poppins-medium text-gray-800">
+                                    Important Cautions
+                                </p>
+                                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                    {prevention.necessary_cautions.map((caution, i) => (
+                                        <li key={i}>{caution}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -177,20 +257,6 @@ function Stat({ label, value }) {
         <div className="flex justify-between text-sm font-poppins">
             <span className="text-gray-500">{label}</span>
             <span>{value}</span>
-        </div>
-    );
-}
-
-/* ACTIONS */
-function Actions() {
-    const items = ["Immediate Treatment", "Preventive Measures", "Long-term Care"];
-    return (
-        <div className="grid md:grid-cols-3 gap-4">
-            {items.map((i) => (
-                <div key={i} className="rounded-3xl border border-neutral-300 p-5 font-poppins hover:bg-lime-50 outline-none transition-colors">
-                    {i}
-                </div>
-            ))}
         </div>
     );
 }
@@ -207,7 +273,7 @@ function ChatUI({ messages, input, setInput, onSend }) {
     return (
         <>
             {/* CHAT MESSAGES — PART OF MAIN SCROLL */}
-            <div className="px-4 py-6 max-w-5xl mx-auto space-y-4 font-poppins">
+            <div className="px-4 py-6 max-w-5xl mx-auto space-y-3 font-poppins -mt-25">
                 {messages.map((m, i) => (
                     <div
                         key={i}
@@ -215,7 +281,7 @@ function ChatUI({ messages, input, setInput, onSend }) {
                     >
                         <div
                             className={`px-4 py-3 rounded-3xl text-sm max-w-[75%]
-              ${m.role === "user" ? "bg-lime-200" : "bg-gray-100"}`}
+              ${m.role === "user" ? "bg-lime-200" : ""}`}
                         >
                             {m.content}
                         </div>
