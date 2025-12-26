@@ -108,7 +108,10 @@ async def analyze_plant(
 
 @router.post("/chat")
 async def follow_up_chat(payload: dict):
-    name = payload.get("name", "the plant")  # 👈 SAFE DEFAULT
+    if "stats" not in payload or "question" not in payload:
+        raise HTTPException(status_code=400, detail="Invalid chat payload")
+
+    name = payload.get("name", "the plant")
 
     return ask_groq_followup(
         name,
@@ -116,6 +119,7 @@ async def follow_up_chat(payload: dict):
         payload.get("previous_response", ""),
         payload["question"]
     )
+
 
 @router.get("")
 def my_chats(user=Depends(get_current_user)):

@@ -31,15 +31,50 @@ export default function UserDashboard() {
         handleUpload(file);
     };
 
-    const handleSend = () => {
-        if (!input.trim()) return;
-        setMessages((prev) => [
-            ...prev,
-            { role: "user", content: input },
-            { role: "ai", content: "Here’s more guidance based on the detected crop condition." }
-        ]);
+    const handleSend = async () => {
+        if (!input.trim() || !analysis) return;
+
+        const userMsg = { role: "user", content: input };
+
+        setMessages(prev => [...prev, userMsg]);
         setInput("");
+        setMessages(prev => [...prev, { role: "ai", content: "Typing…" }]);
+
+        try {
+            const res = await fetch("http://localhost:8000/api/analyze/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: crop,
+                    stats: analysis.stats,
+                    previous_response:
+                        messages
+                            .filter(m => m.role === "ai")
+                            .map(m => m.content)
+                            .join("\n"),
+                    question: userMsg.content,
+                }),
+            });
+
+            const data = await res.json();
+
+            setMessages(prev => [
+                ...prev,
+                { role: "ai", content: data.response }
+            ]);
+        } catch (err) {
+            setMessages(prev => [
+                ...prev,
+                {
+                    role: "ai",
+                    content: "⚠️ Unable to get response. Please try again."
+                }
+            ]);
+        }
     };
+
 
     return (
         <div className="h-screen bg-white flex flex-col">
@@ -78,6 +113,7 @@ export default function UserDashboard() {
                         input={input}
                         setInput={setInput}
                         onSend={handleSend}
+                        analysis={analysis}
                     />
                 </div>
             )}
@@ -262,7 +298,7 @@ function Stat({ label, value }) {
 }
 
 /* CHAT */
-function ChatUI({ messages, input, setInput, onSend }) {
+function ChatUI({ messages, input, setInput, onSend, analysis }) {
     const bottomRef = useRef(null);
 
     // AUTO SCROLL WHEN MESSAGES CHANGE
@@ -280,8 +316,8 @@ function ChatUI({ messages, input, setInput, onSend }) {
                         className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                         <div
-                            className={`px-4 py-3 rounded-3xl text-sm max-w-[75%]
-              ${m.role === "user" ? "bg-lime-200" : ""}`}
+                            className={`px-4 py-3 rounded-3xl text-[15px] max-w-[75%]
+              ${m.role === "user" ? "bg-lime-200 text-black" : "text-gray-700"}`}
                         >
                             {m.content}
                         </div>
@@ -299,6 +335,7 @@ function ChatUI({ messages, input, setInput, onSend }) {
                     <input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        disabled={!analysis}
                         onKeyDown={(e) => e.key === "Enter" && onSend()}
                         placeholder="Ask about this crop…"
                         className="flex-1 border border-neutral-400 rounded-3xl px-4 py-3 text-sm focus:outline-none"

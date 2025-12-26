@@ -164,16 +164,15 @@ def build_followup_prompt(name, stats, previous_response, user_question):
 
     Context:
     - Plant name: {name}
-    - Previously analyzed plant health data is provided
     - The user is asking a follow-up question
 
     Rules:
-    - Do NOT invent numbers
-    - Do NOT re-diagnose from scratch
-    - Use the existing plant health context
-    - Answer conversationally and clearly
-    - Keep it practical and focused on the user's question
-    - Your response should be at least 2 detailed paragraphs.
+    - Do NOT invent numbers, use it for assumptions.
+    - Do NOT re-diagnose from scratch.
+    - Use the existing plant health context.
+    - Answer conversationally and clearly.
+    - Keep it practical and focused on the user's question.
+    - Your response should be detailed and precise enough.
 
     Plant health data:
     {json.dumps(stats, indent=2)}
@@ -202,7 +201,7 @@ def ask_groq_followup(name, stats, previous_response, user_question):
             {"role": "user", "content": prompt}
         ],
         temperature=0.3,
-        max_tokens=1200
+        max_tokens=700
     )
 
     return safe_json_parse(completion.choices[0].message.content)
