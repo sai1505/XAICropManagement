@@ -6,3 +6,4 @@ numpy
 opencv-python
 scipy
 python-multipart
+supabase
