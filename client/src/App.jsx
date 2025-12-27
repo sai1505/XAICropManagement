@@ -13,6 +13,7 @@ import UserHistory from "./components/User/UserHistory";
 import UserImage from "./components/User/UserImage";
 import UserAnalytics from "./components/User/UserAnalytics";
 import AnalyticsPage from "./components/User/UserAnalytics";
+import DashboardTransition from "./components/Transitions/DashboardTransition";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/transition" element={<DashboardTransition />} />
         </Route>
 
         {/* User */}

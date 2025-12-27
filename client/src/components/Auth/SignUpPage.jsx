@@ -8,6 +8,7 @@ export default function SignUpPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [displayName, setDisplayName] = useState("");
+    const [transitioning, setTransitioning] = useState(false);
 
 
     const checks = {
@@ -66,7 +67,7 @@ export default function SignUpPage() {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'http://localhost:5173/dashboard',
+                redirectTo: 'http://localhost:5173/transition',
             },
         })
 
