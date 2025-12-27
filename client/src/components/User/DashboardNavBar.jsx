@@ -57,7 +57,13 @@ export default function DashboardNavBar() {
                     {navLinks.map((link) => (
                         <button
                             className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors"
-                            onClick={() => navigate(link.target)}
+                            onClick={() => {
+                                if (link.name == "New Chat") {
+                                    navigate("/dashboard/new", { replace: true });
+                                } else {
+                                    navigate(link.target);
+                                }
+                            }}
                         >
                             {link.name}
                         </button>

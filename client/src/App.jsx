@@ -9,6 +9,7 @@ import ProtectedRoutes from "./components/Routes/ProtectedRoutes";
 import UserLayout from "./components/Layouts/UserLayout";
 import PublicLayout from "./components/Layouts/PublicLayout";
 import UserProfile from "./components/User/UserProfile";
+import UserHistory from "./components/User/UserHistory";
 
 export default function App() {
   return (
@@ -26,9 +27,10 @@ export default function App() {
         <Route element={<ProtectedRoutes />}>
           <Route path="dashboard" element={<UserLayout />}>
             <Route index element={<Navigate to="new" replace />} />
-            <Route path="new" element={<UserDashboard mode="new" />} />
-            <Route path="chat/:chatId" element={<UserDashboard mode="existing" />} />
+            <Route path="new" element={<UserDashboard />} />
+            <Route path="chat/:chatId" element={<UserDashboard />} />
             <Route path="profile" element={<UserProfile />} />
+            <Route path="history" element={<UserHistory />} />
           </Route>
         </Route>
 

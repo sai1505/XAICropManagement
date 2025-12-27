@@ -14,9 +14,10 @@ export default function UserDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // ONLY reset on /dashboard/new
-        if (!chatId) {
-            resetState();
+        if (chatId) {
+            resumeChat(chatId);   // ONLY resume
+        } else {
+            resetState();         // ALWAYS fresh
         }
     }, [chatId]);
 
@@ -164,6 +165,36 @@ export default function UserDashboard() {
             ]);
         }
     };
+
+    const resumeChat = async (id) => {
+        const { data, error } = await supabase
+            .from("user_chats")
+            .select("*")
+            .eq("id", id)
+            .single();
+
+        if (error) {
+            console.error("Resume failed:", error);
+            return;
+        }
+
+        setCrop(data.title);
+
+        setAnalysis({
+            images: {
+                original: data.main_image,
+                enhanced: data.derived_images?.enhanced,
+                thermal: data.derived_images?.thermal,
+            },
+            stats: data.analysis?.stats,
+            llm_analysis: data.analysis?.llm_analysis,
+            prevention: data.analysis?.prevention,
+        });
+
+        setMessages(data.chat || []);
+        setCurrentChatId(data.id);
+    };
+
 
 
     return (
