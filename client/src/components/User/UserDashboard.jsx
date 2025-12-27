@@ -1,13 +1,58 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
+import { supabase } from "../../supabase/SupabaseClient";
 
 /* MAIN */
 export default function UserDashboard() {
-    const [image, setImage] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [crop, setCrop] = useState("");
     const [analysis, setAnalysis] = useState(null);
+    const [chatId, setChatId] = useState(null);
+
+
+    async function saveToSupabase({ crop, analysis, messages }) {
+        // 1️⃣ Confirm session (already working)
+        const {
+            data: { session },
+            error: sessionError
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+            alert("Please login first");
+            return null;
+        }
+
+        // 2️⃣ INSERT row
+        const { data, error } = await supabase
+            .from("user_chats")
+            .insert({
+                title: crop,
+                main_image: analysis.images.original,
+                derived_images: {
+                    enhanced: analysis.images.enhanced,
+                    thermal: analysis.images.thermal
+                },
+                analysis: {
+                    stats: analysis.stats,
+                    llm_analysis: analysis.llm_analysis,
+                    prevention: analysis.prevention
+                },
+                chat: messages
+            })
+            .select("id")
+            .single();
+
+        // 3️⃣ Handle errors
+        if (error) {
+            console.error("SUPABASE INSERT ERROR:", error);
+            return null;
+        }
+
+        // 4️⃣ Return chat_id
+        return data.id;
+    }
+
 
     const handleUpload = async (file) => {
         if (!crop.trim()) return;
@@ -21,6 +66,15 @@ export default function UserDashboard() {
         });
         const data = await res.json();
         setAnalysis(data);
+
+        const newChatId = await saveToSupabase({
+            crop,
+            analysis: data,
+            messages: []
+        });
+
+        setChatId(newChatId);
+
     };
 
     const imgSrc = (b64) => `data:image/png;base64,${b64}`;
@@ -60,10 +114,28 @@ export default function UserDashboard() {
 
             const data = await res.json();
 
-            setMessages(prev => [
-                ...prev,
+            const updatedMessages = [
+                ...messages,
+                userMsg,
                 { role: "ai", content: data.response }
-            ]);
+            ];
+
+            setMessages(updatedMessages);
+
+            // ✅ UPDATE CHAT IN SUPABASE
+            await supabase
+                .from("user_chats")
+                .update({
+                    chat: updatedMessages,
+                    updated_at: new Date()
+                })
+                .eq("id", chatId);
+
+            if (!chatId) {
+                console.warn("chatId missing, cannot update chat");
+                return;
+            }
+
         } catch (err) {
             setMessages(prev => [
                 ...prev,

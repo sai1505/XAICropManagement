@@ -119,24 +119,3 @@ async def follow_up_chat(payload: dict):
         payload.get("previous_response", ""),
         payload["question"]
     )
-
-
-@router.get("")
-def my_chats(user=Depends(get_current_user)):
-    return load_user_chats(user.id)
-
-@router.post("/new")
-def new_chat(user=Depends(get_current_user)):
-    return { "chat_id": create_new_chat(user.id, user.email) }
-
-@router.get("/{chat_id}")
-def resume(chat_id: str, user=Depends(get_current_user)):
-    return resume_chat(chat_id, user.id)
-
-@router.post("/{chat_id}/message")
-def send(chat_id: str, payload: dict, user=Depends(get_current_user)):
-    return chat_and_continue(
-        chat_id,
-        user.id,
-        payload["message"]
-    )
