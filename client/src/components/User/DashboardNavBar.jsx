@@ -8,7 +8,6 @@ import { supabase } from "../../supabase/SupabaseClient";
 
 const navLinks = [
     { name: "New Chat", target: "/dashboard/new" },
-    { name: "Analytics", target: "/dashboard/analytics" },
     { name: "History", target: "/dashboard/history" },
     { name: "Images", target: "/dashboard/images" },
     { name: "Profile", target: "/dashboard/profile" },
@@ -53,7 +52,7 @@ export default function DashboardNavBar() {
                 </div>
 
                 {/* Center Links */}
-                <div className="ms-30 hidden md:flex items-center px-49 gap-8 text-gray-800 -mt-1">
+                <div className="ms-70 hidden md:flex items-center px-49 gap-8 text-gray-800 -mt-1">
                     {navLinks.map((link) => (
                         <button
                             className="font-poppins hover:text-black hover:bg-lime-200 px-3 py-1.5 rounded-full transition-colors"

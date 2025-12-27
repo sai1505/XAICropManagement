@@ -10,6 +10,9 @@ import UserLayout from "./components/Layouts/UserLayout";
 import PublicLayout from "./components/Layouts/PublicLayout";
 import UserProfile from "./components/User/UserProfile";
 import UserHistory from "./components/User/UserHistory";
+import UserImage from "./components/User/UserImage";
+import UserAnalytics from "./components/User/UserAnalytics";
+import AnalyticsPage from "./components/User/UserAnalytics";
 
 export default function App() {
   return (
@@ -31,6 +34,8 @@ export default function App() {
             <Route path="chat/:chatId" element={<UserDashboard />} />
             <Route path="profile" element={<UserProfile />} />
             <Route path="history" element={<UserHistory />} />
+            <Route path="images" element={<UserImage />} />
+            <Route path="analytics/:chatId" element={<AnalyticsPage />} />
           </Route>
         </Route>
 

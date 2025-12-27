@@ -227,6 +227,7 @@ export default function UserDashboard() {
                         }}
                         stats={analysis.stats}
                         analysis={analysis}
+                        currentChatId={currentChatId}
                     />
 
                     <ChatUI
@@ -278,11 +279,11 @@ function ImageUpload({ crop, setCrop, handleFileChange }) {
 
 
 /* ANALYSIS FLOW */
-function AnalysisFlow({ image, stats, analysis }) {
+function AnalysisFlow({ image, stats, analysis, currentChatId }) {
     return (
         <div className="px-4 py-10 space-y-10 max-w-5xl mx-auto pb-32">
             <ImageFlow image={image} />
-            <Insights stats={stats} llm={analysis.llm_analysis} prevention={analysis.prevention} />
+            <Insights stats={stats} llm={analysis.llm_analysis} prevention={analysis.prevention} chatId={currentChatId} />
         </div>
     );
 }
@@ -313,9 +314,10 @@ function ImageCard({ title, image, icon, overlay }) {
 }
 
 /* INSIGHTS */
-function Insights({ stats, llm, prevention }) {
+function Insights({ stats, llm, prevention, chatId }) {
     const health = stats.plant_health;
     const imageAnalysis = stats.image_analysis;
+    const navigate = useNavigate();
 
     return (
         <div className="space-y-6">
@@ -404,6 +406,14 @@ function Insights({ stats, llm, prevention }) {
                     </div>
                 </div>
             )}
+
+            {/* 🔥 ANALYTICS BUTTON */}
+            <button
+                onClick={() => navigate(`/dashboard/analytics/${chatId}`)}
+                className="mt-4 px-6 py-2 bg-lime-300 rounded-full hover:bg-lime-400 transition"
+            >
+                View Detailed Analytics
+            </button>
         </div>
     );
 }
