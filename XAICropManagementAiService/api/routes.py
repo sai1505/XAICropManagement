@@ -5,7 +5,6 @@ import shutil
 import numpy as np
 from datetime import datetime
 from services.stress import encode_image
-from api.deps import get_current_user
 from services.thermal import rgb_to_pseudo_thermal
 from services.stress import detect_stress
 from services.stats import generate_plant_stats
