@@ -11,12 +11,6 @@ from services.stress import detect_stress
 from services.stats import generate_plant_stats
 from services.llm import ask_groq_followup, ask_groq_for_analysis, ask_groq_for_prevention
 from core.config import OUTPUT_DIR
-from services.chat_service import (
-    load_user_chats,
-    resume_chat,
-    create_new_chat,
-    chat_and_continue
-)
 
 router = APIRouter(prefix="/analyze", tags=["Plant Analysis"])
 

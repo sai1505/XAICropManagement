@@ -1,7 +1,7 @@
 import NavBar from "./components/NavBar";
 import HomePage from "./components/HomePage";
 import Footer from "./components/Footer";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import SignUpPage from "./components/Auth/SignUpPage";
 import SignInPage from "./components/Auth/SignInPage";
 import UserDashboard from "./components/User/UserDashboard";
@@ -25,7 +25,9 @@ export default function App() {
         {/* User */}
         <Route element={<ProtectedRoutes />}>
           <Route path="dashboard" element={<UserLayout />}>
-            <Route index element={<UserDashboard />} />
+            <Route index element={<Navigate to="new" replace />} />
+            <Route path="new" element={<UserDashboard mode="new" />} />
+            <Route path="chat/:chatId" element={<UserDashboard mode="existing" />} />
             <Route path="profile" element={<UserProfile />} />
           </Route>
         </Route>

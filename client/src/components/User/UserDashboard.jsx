@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
 import { supabase } from "../../supabase/SupabaseClient";
 
@@ -8,8 +9,24 @@ export default function UserDashboard() {
     const [input, setInput] = useState("");
     const [crop, setCrop] = useState("");
     const [analysis, setAnalysis] = useState(null);
-    const [chatId, setChatId] = useState(null);
+    const [currentChatId, setCurrentChatId] = useState(null); // local state
+    const { chatId } = useParams();
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        // ONLY reset on /dashboard/new
+        if (!chatId) {
+            resetState();
+        }
+    }, [chatId]);
+
+    const resetState = () => {
+        setMessages([]);
+        setInput("");
+        setCrop("");
+        setAnalysis(null);
+        setCurrentChatId(null);
+    };
 
     async function saveToSupabase({ crop, analysis, messages }) {
         // 1️⃣ Confirm session (already working)
@@ -73,7 +90,8 @@ export default function UserDashboard() {
             messages: []
         });
 
-        setChatId(newChatId);
+        setCurrentChatId(newChatId);
+        navigate(`/dashboard/chat/${newChatId}`, { replace: true });
 
     };
 
@@ -123,18 +141,18 @@ export default function UserDashboard() {
             setMessages(updatedMessages);
 
             // ✅ UPDATE CHAT IN SUPABASE
+            if (!currentChatId) {
+                console.warn("chatId missing, cannot update chat");
+                return;
+            }
+
             await supabase
                 .from("user_chats")
                 .update({
                     chat: updatedMessages,
                     updated_at: new Date()
                 })
-                .eq("id", chatId);
-
-            if (!chatId) {
-                console.warn("chatId missing, cannot update chat");
-                return;
-            }
+                .eq("id", currentChatId);
 
         } catch (err) {
             setMessages(prev => [

@@ -7,12 +7,13 @@ import leafAnim from "../../assets/LeafAnim.json";
 import { supabase } from "../../supabase/SupabaseClient";
 
 const navLinks = [
-    { name: "New Chat", target: "" },
-    { name: "Analytics", target: "analytics" },
-    { name: "History", target: "history" },
-    { name: "Images", target: "images" },
-    { name: "Profile", target: "profile" },
+    { name: "New Chat", target: "/dashboard/new" },
+    { name: "Analytics", target: "/dashboard/analytics" },
+    { name: "History", target: "/dashboard/history" },
+    { name: "Images", target: "/dashboard/images" },
+    { name: "Profile", target: "/dashboard/profile" },
 ];
+
 
 export default function DashboardNavBar() {
     const [scrolled, setScrolled] = useState(false);
