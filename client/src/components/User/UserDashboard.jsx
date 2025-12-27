@@ -437,7 +437,7 @@ function ChatUI({ messages, input, setInput, onSend, analysis }) {
                         className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                         <div
-                            className={`px-4 py-3 rounded-3xl text-[15px] max-w-[75%]
+                            className={`px-4 py-3 rounded-3xl leading-relaxed text-[15px] max-w-[75%]
               ${m.role === "user" ? "bg-lime-200 text-black" : "text-gray-700"}`}
                         >
                             {m.content}
