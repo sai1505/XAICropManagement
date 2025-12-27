@@ -11,6 +11,10 @@ export default function UserDashboard() {
     const [analysis, setAnalysis] = useState(null);
     const [currentChatId, setCurrentChatId] = useState(null); // local state
     const { chatId } = useParams();
+    const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+    const [loadingResume, setLoadingResume] = useState(false);
+    const isProcessing =
+        loadingAnalysis || loadingResume || analysis;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -74,6 +78,10 @@ export default function UserDashboard() {
 
     const handleUpload = async (file) => {
         if (!crop.trim()) return;
+
+        setLoadingAnalysis(true);
+        setAnalysis(null);
+
         const formData = new FormData();
         formData.append("name", crop);
         formData.append("image", file);
@@ -82,7 +90,9 @@ export default function UserDashboard() {
             method: "POST",
             body: formData,
         });
+
         const data = await res.json();
+
         setAnalysis(data);
 
         const newChatId = await saveToSupabase({
@@ -93,6 +103,7 @@ export default function UserDashboard() {
 
         setCurrentChatId(newChatId);
         navigate(`/dashboard/chat/${newChatId}`, { replace: true });
+        setLoadingAnalysis(false);
 
     };
 
@@ -167,6 +178,8 @@ export default function UserDashboard() {
     };
 
     const resumeChat = async (id) => {
+        setLoadingResume(true);
+
         const { data, error } = await supabase
             .from("user_chats")
             .select("*")
@@ -193,14 +206,14 @@ export default function UserDashboard() {
 
         setMessages(data.chat || []);
         setCurrentChatId(data.id);
+        setLoadingResume(false);
     };
-
-
 
     return (
         <div className="h-screen bg-white flex flex-col">
 
-            {!analysis && (
+            {/* 🔴 IMAGE UPLOAD — ONLY FIRST TIME */}
+            {!isProcessing && (
                 <ImageUpload
                     crop={crop}
                     setCrop={setCrop}
@@ -208,40 +221,51 @@ export default function UserDashboard() {
                 />
             )}
 
-            {analysis && (
+            {/* 🟡 PROCESSING / RESUMING / ANALYSIS */}
+            {isProcessing && (
                 <div className="flex-1 overflow-y-auto">
+
+                    {/* TITLE (REAL OR SKELETON) */}
                     <div className="mt-20 flex justify-center">
-                        <h1
-                            className="mt-5 inline-flex px-6 py-2 bg-lime-200 text-2xl font-poppins-medium rounded-3xl text-center"
-                        >
-                            {crop} Analysis
-                        </h1>
+                        {analysis ? (
+                            <h1 className="mt-5 inline-flex px-6 py-2 bg-lime-200 text-2xl font-poppins-medium rounded-3xl">
+                                {crop} Analysis
+                            </h1>
+                        ) : (
+                            <div className="h-10 w-56 bg-gray-200 rounded-full animate-pulse" />
+                        )}
                     </div>
 
+                    {/* 🔹 MAIN FLOW */}
+                    {analysis ? (
+                        <>
+                            <AnalysisFlow
+                                image={{
+                                    original: imgSrc(analysis.images.original),
+                                    enhanced: imgSrc(analysis.images.enhanced),
+                                    thermal: imgSrc(analysis.images.thermal),
+                                }}
+                                stats={analysis.stats}
+                                analysis={analysis}
+                                currentChatId={currentChatId}
+                            />
 
-                    <AnalysisFlow
-                        image={{
-                            original: imgSrc(analysis.images.original),
-                            enhanced: imgSrc(analysis.images.enhanced),
-                            thermal: imgSrc(analysis.images.thermal),
-                        }}
-                        stats={analysis.stats}
-                        analysis={analysis}
-                        currentChatId={currentChatId}
-                    />
-
-                    <ChatUI
-                        messages={messages}
-                        input={input}
-                        setInput={setInput}
-                        onSend={handleSend}
-                        analysis={analysis}
-                    />
+                            <ChatUI
+                                messages={messages}
+                                input={input}
+                                setInput={setInput}
+                                onSend={handleSend}
+                                analysis={analysis}
+                            />
+                        </>
+                    ) : (
+                        <FullAnalysisSkeleton />
+                    )}
                 </div>
             )}
         </div>
-
     );
+
 
 }
 
@@ -483,3 +507,49 @@ function ChatUI({ messages, input, setInput, onSend, analysis }) {
         </>
     );
 }
+
+function FullAnalysisSkeleton() {
+    return (
+        <div className="px-4 py-10 space-y-10 max-w-5xl mx-auto pb-32 animate-pulse">
+
+            {/* IMAGES */}
+            <div className="grid md:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="h-48 bg-gray-200 rounded-2xl" />
+                ))}
+            </div>
+
+            {/* AI FINDINGS */}
+            <div className="rounded-3xl bg-gray-100 p-6 space-y-3">
+                {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className="h-4 bg-gray-200 rounded w-full" />
+                ))}
+            </div>
+
+            {/* EXPLANATION */}
+            <div className="space-y-3">
+                <div className="h-6 bg-gray-200 rounded w-48" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+            </div>
+
+            {/* PREVENTION */}
+            <div className="space-y-3">
+                <div className="h-5 bg-gray-200 rounded w-40" />
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="h-4 bg-gray-200 rounded w-full" />
+                ))}
+            </div>
+
+            {/* CHAT */}
+            <div className="space-y-3">
+                <div className="h-10 bg-gray-200 rounded-3xl w-2/3" />
+                <div className="h-10 bg-gray-200 rounded-3xl w-1/2" />
+            </div>
+
+            {/* INPUT */}
+            <div className="h-12 bg-gray-200 rounded-3xl" />
+        </div>
+    );
+}
+

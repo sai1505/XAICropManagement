@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import leafAnim from "../../assets/LeafAnim.json";
 import { supabase } from "../../supabase/SupabaseClient";
+import SigningOutTransition from "../Transitions/SigningOutTransition";
 
 const navLinks = [
     { name: "New Chat", target: "/dashboard/new" },
@@ -16,6 +17,7 @@ const navLinks = [
 
 export default function DashboardNavBar() {
     const [scrolled, setScrolled] = useState(false);
+    const [signingOut, setSigningOut] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,15 +31,21 @@ export default function DashboardNavBar() {
     }, []);
 
     const handleSignOut = async () => {
-        const { error } = supabase.auth.signOut();
+        setSigningOut(true);
 
+        const { error } = await supabase.auth.signOut();
         if (error) {
-            console.error("Sign out failed:", error.message);
-            return false;
+            console.error(error.message);
+            setSigningOut(false);
+            return;
         }
-        navigate('/signin');
-        return true;
+
+        setTimeout(() => {
+            navigate("/signin", { replace: true });
+        }, 2500);
     };
+
+    if (signingOut) return <SigningOutTransition />;
 
     return (
         <nav

@@ -7,17 +7,65 @@ import { ArrowRight } from "lucide-react";
 export default function AnalyticsPage() {
     const { chatId } = useParams();
     const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
+        setLoading(true);
         supabase
             .from("user_chats")
             .select("analysis")
             .eq("id", chatId)
             .single()
-            .then(({ data }) => setStats(data.analysis.stats));
+            .then(({ data }) => {
+                setStats(data?.analysis?.stats || null);
+                setLoading(false);
+            });
     }, [chatId]);
 
-    if (!stats) return <div className="pt-28 text-center">Loading analytics…</div>;
+
+    const SkeletonChart = ({ h = 300 }) => (
+        <div
+            className="w-full bg-gray-200 rounded-2xl animate-pulse"
+            style={{ height: h }}
+        />
+    );
+
+    const SkeletonSection = ({ title, height }) => (
+        <div className="bg-neutral-100 rounded-3xl p-6 shadow-sm animate-pulse">
+            <div className="h-4 w-48 bg-gray-300 rounded mb-4" />
+            <SkeletonChart h={height} />
+            <div className="h-3 w-3/4 bg-gray-200 rounded mt-3" />
+        </div>
+    );
+
+    const SkeletonStatus = () => (
+        <div className="bg-gray-200 rounded-3xl p-5 text-center animate-pulse">
+            <div className="h-3 w-24 bg-gray-300 rounded mx-auto mb-2" />
+            <div className="h-5 w-16 bg-gray-400 rounded mx-auto" />
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <div className="max-w-5xl mx-auto pt-28 px-4 font-poppins space-y-16">
+                <SkeletonSection title="Overall Plant Health" height={400} />
+                <SkeletonSection title="Stress & Damage Levels" height={260} />
+                <SkeletonSection title="Plant Stability & Recovery System" height={360} />
+                <SkeletonSection title="Infection Spread Coverage" height={260} />
+
+                <div className="grid md:grid-cols-3 gap-4">
+                    <SkeletonStatus />
+                    <SkeletonStatus />
+                    <SkeletonStatus />
+                </div>
+            </div>
+        );
+    }
+
+    if (!stats) {
+        return <div className="pt-28 text-center">No analytics data</div>;
+    }
 
     const h = stats.plant_health;
     const i = stats.image_analysis;
@@ -192,6 +240,7 @@ export default function AnalyticsPage() {
         </div>
     );
 }
+
 
 /* ---------------- UI HELPERS ---------------- */
 

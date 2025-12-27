@@ -4,18 +4,23 @@ import { Download } from "lucide-react";
 
 export default function UserImage() {
     const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         loadImages();
     }, []);
 
     const loadImages = async () => {
+        setLoading(true);
+
         const { data, error } = await supabase
             .from("user_chats")
             .select("id, title, created_at, main_image, derived_images")
             .order("created_at", { ascending: false });
 
-        if (!error) setItems(data);
+        if (!error) setItems(data || []);
+        setLoading(false);
     };
 
     const imgSrc = (b64) => `data:image/png;base64,${b64}`;
@@ -27,15 +32,48 @@ export default function UserImage() {
         link.click();
     };
 
+    const SkeletonImageCard = () => (
+        <div className="rounded-2xl overflow-hidden bg-white shadow animate-pulse">
+            <div className="h-48 bg-gray-200" />
+            <div className="flex items-center justify-between px-4 py-3">
+                <div className="h-4 w-20 bg-gray-300 rounded" />
+                <div className="h-8 w-8 bg-gray-300 rounded-full" />
+            </div>
+        </div>
+    );
+
+    const SkeletonChatBlock = () => (
+        <div className="bg-gray-100 rounded-3xl p-6 space-y-4 animate-pulse">
+            <div className="space-y-2">
+                <div className="h-4 w-48 bg-gray-300 rounded" />
+                <div className="h-3 w-32 bg-gray-200 rounded" />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+                <SkeletonImageCard />
+                <SkeletonImageCard />
+                <SkeletonImageCard />
+            </div>
+        </div>
+    );
+
+
     return (
+
         <div className="max-w-6xl mx-auto pt-28 px-4 font-poppins space-y-6">
             <h1 className="text-2xl font-poppins-medium">Your Images</h1>
 
-            {items.length === 0 && (
+            {loading && (
+                Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonChatBlock key={i} />
+                ))
+            )}
+
+            {!loading && items.length === 0 && (
                 <p className="text-gray-500">No images yet</p>
             )}
 
-            {items.map(chat => (
+            {!loading && items.map(chat => (
                 <div
                     key={chat.id}
                     className="bg-lime-50 rounded-3xl p-6 space-y-4"
