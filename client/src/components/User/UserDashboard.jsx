@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Upload, Send, Image as ImageIcon, Thermometer, Sparkles, HelpCircle } from "lucide-react";
 import { supabase } from "../../supabase/SupabaseClient";
+import { motion } from "framer-motion";
 
 /* MAIN */
 export default function UserDashboard() {
@@ -122,7 +123,7 @@ export default function UserDashboard() {
 
         setMessages(prev => [...prev, userMsg]);
         setInput("");
-        setMessages(prev => [...prev, { role: "ai", content: "Typing…" }]);
+        setMessages(prev => [...prev, { role: "ai", content: "__thinking__" }]);
 
         try {
             const res = await fetch("http://localhost:8000/api/analyze/chat", {
@@ -470,12 +471,24 @@ function ChatUI({ messages, input, setInput, onSend, analysis }) {
                         key={i}
                         className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                        <div
-                            className={`px-4 py-3 rounded-3xl leading-relaxed text-[15px] max-w-[75%]
-              ${m.role === "user" ? "bg-lime-200 text-black" : "text-gray-700"}`}
-                        >
-                            {m.content}
-                        </div>
+                        {m.role === "ai" ? (
+                            m.content === "__thinking__" ? (
+                                <AIThinking />
+                            ) : (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 1.5, ease: "easeOut" }}
+                                    className="px-4 py-3 rounded-3xl leading-relaxed text-[15px] max-w-[75%] text-gray-700"
+                                >
+                                    {m.content}
+                                </motion.div>
+                            )
+                        ) : (
+                            <div className="px-4 py-3 rounded-3xl leading-relaxed text-[15px] max-w-[75%] bg-lime-200 text-black">
+                                {m.content}
+                            </div>
+                        )}
                     </div>
                 ))}
 
@@ -553,3 +566,24 @@ function FullAnalysisSkeleton() {
     );
 }
 
+function AIThinking() {
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="px-4 py-3 rounded-3xl text-gray-600 flex items-center gap-2"
+        >
+            <motion.div
+                animate={{ rotate: 360 }}
+                transition={{
+                    repeat: Infinity,
+                    duration: 1.2,
+                    ease: "linear",
+                }}
+            >
+                <Sparkles size={20} className="text-lime-400" />
+            </motion.div>
+            <span className="text-sm">thinking</span>
+        </motion.div>
+    );
+}
