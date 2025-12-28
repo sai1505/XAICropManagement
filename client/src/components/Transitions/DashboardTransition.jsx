@@ -13,7 +13,15 @@ export default function DashboardTransition() {
     }, []);
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <div className="
+            fixed inset-0 z-[9999]
+            flex items-center justify-center
+            bg-gradient-to-br
+            from-green-50
+            via-white
+            to-lime-50
+            ">
+
             <div className="flex items-center gap-4">
 
                 <Lottie
@@ -22,12 +30,11 @@ export default function DashboardTransition() {
                     className="w-24 h-24"
                 />
 
-                <span className="text-sm text-gray-600 tracking-wide animate-pulse">
-                    Loading…
+                <span className="text-xs text-gray-500 tracking-wider uppercase">
+                    Loading..
                 </span>
 
             </div>
         </div>
-
     );
 }

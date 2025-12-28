@@ -1,7 +1,7 @@
 import React from "react";
 import { Asterisk } from 'lucide-react';
 import Lottie from "lottie-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import leafAnim from "../assets/LeafAnim.json";
 
@@ -16,6 +16,11 @@ const navLinks = [
 export default function NavBar() {
     const [scrolled, setScrolled] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const isAuthPage =
+        location.pathname === "/signin" ||
+        location.pathname === "/signup";
 
     const goToSection = (id) => {
         navigate("/");
@@ -50,9 +55,17 @@ export default function NavBar() {
                 </div>
 
                 {/* Center Links */}
-                <div className={`ms-30 hidden md:flex items-center px-49 gap-8 -mt-1 
-                    ${scrolled ? "text-black" : "text-white"}
-                `}>
+                <div
+                    className={`ms-30 hidden md:flex items-center px-49 gap-8 -mt-1
+                        ${isAuthPage
+                            ? "text-black"
+                            : scrolled
+                                ? "text-black"
+                                : "text-white"
+                        }
+                    `}
+                >
+
                     {navLinks.map((link) => (
                         <button
                             key={link.target}

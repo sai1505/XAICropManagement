@@ -40,12 +40,10 @@ export default function DashboardNavBar() {
             return;
         }
 
-        setTimeout(() => {
-            navigate("/signin", { replace: true });
-        }, 2500);
+        navigate("/signout");
+
     };
 
-    if (signingOut) return <SigningOutTransition />;
 
     return (
         <nav

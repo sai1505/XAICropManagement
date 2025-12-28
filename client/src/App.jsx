@@ -14,18 +14,24 @@ import UserImage from "./components/User/UserImage";
 import UserAnalytics from "./components/User/UserAnalytics";
 import AnalyticsPage from "./components/User/UserAnalytics";
 import DashboardTransition from "./components/Transitions/DashboardTransition";
+import SigningOutTransition from "./components/Transitions/SigningOutTransition";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Transition — NO layout */}
+        <Route path="/transition" element={<DashboardTransition />} />
+
+        {/* Signing out — NO layout */}
+        <Route path="/signout" element={<SigningOutTransition />} />
+
         {/* Public */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
-          <Route path="/transition" element={<DashboardTransition />} />
         </Route>
 
         {/* User */}
