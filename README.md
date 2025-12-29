@@ -11,7 +11,7 @@ XCropAI is an AI-powered crop analysis and assistance platform designed to help 
 * 📊 **Analytics Dashboard** with visual insights
 * 🧠 **LLM-based Explanations** for easy understanding
 * ☁️ **Cloud Storage & Auth** via Supabase
-* 🧪 **Thermal / Enhanced Image Support** (if enabled)
+* 🧪 **Thermal / Enhanced Image Support**
 * 🔐 **Secure Authentication** and role-based access
 * ⚡ Fast, scalable API with FastAPI
 
@@ -37,7 +37,6 @@ XCropAI is an AI-powered crop analysis and assistance platform designed to help 
 * **Python**
 * **NumPy, OpenCV, SciPy**
 * **Groq API** (LLM inference)
-* **Custom ML models** for image analysis
 
 ### Cloud & Auth
 
