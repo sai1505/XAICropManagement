@@ -140,7 +140,7 @@ python run.py
 📘 Official Docs:
 
 * [https://supabase.com/docs](https://supabase.com/docs)
-* [https://supabase.com/docs/guides/database/postgres](https://supabase.com/docs/guides/database/postgres)
+* [https://supabase.com/docs/guides/database/overview](https://supabase.com/docs/guides/database/overview)
 
 ---
 
